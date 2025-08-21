@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Processador de Imagens</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body class="is-light">
+    <button class="theme-toggle" id="themeToggle">🌙 Escuro</button>
+    <div class="container">
+      <h1>Processador de Imagens</h1>
+      <div class="images-display" id="imagesDisplay"></div>
+      <div class="upload-section">
+        <div class="upload-box" id="upload1">
+          <input type="file" id="image1" accept="image/*" />
+          <div class="upload-text">Selecionar Imagem 1</div>
+        </div>
+        <div class="upload-box" id="upload2">
+          <input type="file" id="image2" accept="image/*" />
+          <div class="upload-text">Selecionar Imagem 2</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="control-group">
+          <label for="valueInput">Valor para operação:</label>
+          <input type="number" id="valueInput" value="0" min="-255" max="255" />
+        </div>
+        <div class="control-group">
+          <button class="btn-operation" onclick="addValueToImage()">
+            Adicionar Valor
+          </button>
+        </div>
+        <div class="control-group">
+          <button class="btn-operation" onclick="subtractValueFromImage()">
+            Subtrair Valor
+          </button>
+        </div>
+        <div class="control-group">
+          <button class="btn-operation" onclick="addImages()">
+            Somar Imagens
+          </button>
+        </div>
+        <div class="control-group">
+          <button class="btn-operation" onclick="subtractImages()">
+            Subtrair Imagens
+          </button>
+        </div>
+        <div class="control-group">
+          <select name="valueSelector" id="valueSelector" class="valueSelector">
+            <option value="0.25">0.25x</option>
+            <option value="0.50">0.50x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2.0">2x</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <button class="btn-operation" onclick="multiValueToImage()">
+            Multiplicar Valor
+          </button>
+        </div>
+        <div class="control-group">
+          <button class="btn-operation" onclick="multiValueToImage()">
+            Dividir Valor
+          </button>
+        </div>
+        <div class="control-group">
+          <button class="clearBtn" onclick="clearImg()">Limpar</button>
+        </div>
+        <div class="control-group">
+          <button class="saveBtn" onclick="saveImg()">Salvar</button>
+        </div>
+      </div>
+      <div class="color-info" id="colorInfo" style="display: none">
+        <h3>Informações de Cor do Pixel Clicado</h3>
+        <div class="color-values">
+          <div class="color-value">
+            <h4>RGB</h4>
+            <p id="rgbValue">-</p>
+          </div>
+          <div class="color-value">
+            <h4>CMYK</h4>
+            <p id="cmykValue">-</p>
+          </div>
+          <div class="color-value">
+            <h4>HSL</h4>
+            <p id="hslValue">-</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
