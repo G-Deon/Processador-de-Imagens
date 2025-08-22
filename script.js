@@ -283,6 +283,16 @@ function dividerValueToImage() {
   processImageWithValue("divider", value);
 }
 
+function grayTransform() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const value = 3;
+  processImageWithValue("gray", value);
+}
+
 function processImages(operation) {
   const width = Math.min(image1Data.width, image2Data.width);
   const height = Math.min(image1Data.height, image2Data.height);
@@ -369,6 +379,12 @@ function processImageWithValue(operation, value) {
         resultData[i] = Math.max(0, r / value);
         resultData[i + 1] = Math.max(0, g / value);
         resultData[i + 2] = Math.max(0, b / value);
+        resultData[i + 3] = a;
+        break;
+      case "gray":
+        resultData[i] = Math.max(0, (r + g + b) / value);
+        resultData[i + 1] = Math.max(0, (r + g + b) / value);
+        resultData[i + 2] = Math.max(0, (r + g + b) / value);
         resultData[i + 3] = a;
         break;
     }
