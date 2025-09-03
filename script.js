@@ -8,7 +8,7 @@ const themeBtn = document.getElementById("themeToggle");
 themeBtn.addEventListener("click", switchTheme);
 
 document.getElementById("image1").addEventListener("click", function (e) {
-  e.target.value = ""; // Limpa antes de abrir
+  e.target.value = "";
 });
 
 document.getElementById("image1").addEventListener("change", function (e) {
@@ -16,7 +16,7 @@ document.getElementById("image1").addEventListener("change", function (e) {
 });
 
 document.getElementById("image2").addEventListener("click", function (e) {
-  e.target.value = ""; // Limpa antes de abrir
+  e.target.value = "";
 });
 
 document.getElementById("image2").addEventListener("change", function (e) {
@@ -49,32 +49,58 @@ function setAtive(ev) {
 
 function loadImage(file, imageNumber) {
   if (!file) return;
+  const fileName = file.name.toLowerCase();
+  if (fileName.endsWith(".tif") || fileName.endsWith(".tiff")) {
+    loadTiffImage(file, imageNumber);
+  } else {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        if (imageNumber === 1) {
+          image1Data = imageData;
+          canvas1 = canvas;
+          displayImage(canvas, "Imagem 1", "image1-display");
+        } else {
+          image2Data = imageData;
+          canvas2 = canvas;
+          displayImage(canvas, "Imagem 2", "image2-display");
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function loadTiffImage(file, imageNumber) {
   const reader = new FileReader();
   reader.onload = function (e) {
-    const img = new Image();
-    img.onload = function () {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
+    const tiff = new Tiff({ buffer: e.target.result });
+    const canvas = tiff.toCanvas();
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-      if (imageNumber === 1) {
-        image1Data = imageData;
-        canvas1 = canvas;
-        displayImage(canvas, "Imagem 1", "image1-display");
-      } else {
-        image2Data = imageData;
-        canvas2 = canvas;
-        displayImage(canvas, "Imagem 2", "image2-display");
-      }
-    };
-    img.src = e.target.result;
+    if (imageNumber === 1) {
+      image1Data = imageData;
+      canvas1 = canvas;
+      displayImage(canvas, "Imagem TIFF 1", "image1-display");
+    } else {
+      image2Data = imageData;
+      canvas2 = canvas;
+      displayImage(canvas, "Imagem TIFF 2", "image2-display");
+    }
   };
-  reader.readAsDataURL(file);
+  reader.readAsArrayBuffer(file);
 }
 
 function displayImage(canvas, title, id) {
