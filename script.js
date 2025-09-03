@@ -7,8 +7,16 @@ let resultCanvas = null;
 const themeBtn = document.getElementById("themeToggle");
 themeBtn.addEventListener("click", switchTheme);
 
+document.getElementById("image1").addEventListener("click", function (e) {
+  e.target.value = ""; // Limpa antes de abrir
+});
+
 document.getElementById("image1").addEventListener("change", function (e) {
   loadImage(e.target.files[0], 1);
+});
+
+document.getElementById("image2").addEventListener("click", function (e) {
+  e.target.value = ""; // Limpa antes de abrir
 });
 
 document.getElementById("image2").addEventListener("change", function (e) {
@@ -25,9 +33,22 @@ function switchTheme() {
   }
 }
 
+function setAtive(ev) {
+  const targetId = ev.currentTarget.dataset.target;
+  const targetSection = document.getElementById(targetId);
+  const oldSection = document.querySelector('section[data-active="true"]');
+  const oldActive = document.querySelector('a[data-active="true"]');
+  const activeFunction = ev.currentTarget;
+  if (oldActive) {
+    oldActive.setAttribute("data-active", "false");
+    oldSection.setAttribute("data-active", "false");
+  }
+  activeFunction.setAttribute("data-active", "true");
+  targetSection.setAttribute("data-active", "true");
+}
+
 function loadImage(file, imageNumber) {
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function (e) {
     const img = new Image();
@@ -89,7 +110,28 @@ function displayImage(canvas, title, id) {
   });
 
   container.appendChild(displayCanvas);
-  display.appendChild(container);
+  if (id === "image1-display") {
+    const firstChild = display.firstChild;
+    if (firstChild) {
+      display.insertBefore(container, firstChild);
+    } else {
+      display.appendChild(container);
+    }
+  } else if (id === "image2-display") {
+    const image1Container = document.getElementById("image1-display");
+    if (image1Container) {
+      image1Container.insertAdjacentElement("afterend", container);
+    } else {
+      const firstChild = display.firstChild;
+      if (firstChild) {
+        display.insertBefore(container, firstChild);
+      } else {
+        display.appendChild(container);
+      }
+    }
+  } else {
+    display.appendChild(container);
+  }
 }
 
 function showPixelColor(canvas, x, y) {
@@ -108,7 +150,6 @@ function showPixelColor(canvas, x, y) {
   document.getElementById("rgbValue").textContent = rgb;
   document.getElementById("cmykValue").textContent = cmyk;
   document.getElementById("hslValue").textContent = hsl;
-  document.getElementById("colorInfo").style.display = "block";
 }
 
 function rgbToCmyk(r, g, b) {
