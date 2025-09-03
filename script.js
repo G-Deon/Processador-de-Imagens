@@ -494,3 +494,96 @@ function flipVertical() {
   displayImage(canvas, "Hello", "result-display");
   showStatus(title, "concluido com sucesso!");
 }
+
+function difference() {
+  const width = Math.min(image1Data.width, image2Data.width);
+  const height = Math.min(image1Data.height, image2Data.height);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const imageDataC = ctx.createImageData(width, height);
+  const imageDataD = ctx.createImageData(width, height);
+  const imageDataE = ctx.createImageData(width, height);
+  const imageC = imageDataC.data;
+  const imageD = imageDataD.data;
+  const imageE = imageDataE.data;
+
+  for (let i = 0; i < width * height * 4; i += 4) {
+    const r1 = image1Data.data[i];
+    const g1 = image1Data.data[i + 1];
+    const b1 = image1Data.data[i + 2];
+    const a1 = image1Data.data[i + 3];
+
+    const r2 = image2Data.data[i];
+    const g2 = image2Data.data[i + 1];
+    const b2 = image2Data.data[i + 2];
+    const a2 = image2Data.data[i + 3];
+
+    imageC[i] = Math.min(255, r1 - r2);
+    imageC[i + 1] = Math.min(255, g1 - g2);
+    imageC[i + 2] = Math.min(255, b1 - b2);
+    imageC[i + 3] = Math.min(a1, a2);
+
+    imageD[i] = Math.min(255, r2 - r1);
+    imageD[i + 1] = Math.min(255, g2 - g1);
+    imageD[i + 2] = Math.min(255, b2 - b1);
+    imageD[i + 3] = Math.min(a2, a1);
+  }
+  for (let j = 0; j < width * height * 4; j += 4) {
+    const r3 = imageC[j];
+    const g3 = imageC[j + 1];
+    const b3 = imageC[j + 2];
+    const a3 = imageC[j + 3];
+
+    const r4 = imageD[j];
+    const g4 = imageD[j + 1];
+    const b4 = imageD[j + 2];
+    const a4 = imageD[j + 3];
+
+    imageE[j] = Math.min(255, r3 + r4);
+    imageE[j + 1] = Math.min(255, g3 + g4);
+    imageE[j + 2] = Math.min(255, b3 + b4);
+    imageE[j + 3] = Math.min(a3, a4);
+  }
+  ctx.putImageData(imageDataE, 0, 0);
+  displayImage(canvas, "Diferença das imagens", "result-display");
+}
+
+function Blending() {
+  const width = Math.min(image1Data.width, image2Data.width);
+  const height = Math.min(image1Data.height, image2Data.height);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const value = parseFloat(document.getElementById("blendingValue").value);
+
+  for (let i = 0; i < width * height * 4; i += 4) {
+    const r1 = image1Data.data[i];
+    const g1 = image1Data.data[i + 1];
+    const b1 = image1Data.data[i + 2];
+    const a1 = image1Data.data[i + 3];
+
+    const r2 = image2Data.data[i];
+    const g2 = image2Data.data[i + 1];
+    const b2 = image2Data.data[i + 2];
+    const a2 = image2Data.data[i + 3];
+
+    resultData[i] = Math.min(255, value * r1 + (1 - value) * r2);
+    resultData[i + 1] = Math.min(255, value * g1 + (1 - value) * g2);
+    resultData[i + 2] = Math.min(255, value * b1 + (1 - value) * b2);
+    resultData[i + 3] = Math.min(a1, a2);
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  let title = "Blending " + value;
+  displayImage(canvas, title, "result-display");
+}
