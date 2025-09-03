@@ -442,3 +442,29 @@ function processImageWithValue(operation, value) {
 
   showStatus(title + " concluído com sucesso!");
 }
+
+function flipHorizontal() {
+  const canvas = document.createElement("canvas");
+  canvas.width = image1Data.width;
+  canvas.height = image1Data.height;
+  const ctx = canvas.getContext("2d");
+
+  ctx.scale(-1, 1);
+  ctx.drawImage(canvas1, -canvas.width, 0);
+
+  displayImage(canvas, "sadas", "result-display");
+  showStatus(title + " concluído com sucesso!");
+}
+
+function flipVertical() {
+  const canvas = document.createElement("canvas");
+  canvas.width = image1Data.width;
+  canvas.height = image1Data.height;
+  const ctx = canvas.getContext("2d");
+
+  ctx.scale(1, -1);
+  ctx.drawImage(canvas1, 0, -canvas.height);
+
+  displayImage(canvas, "Hello", "result-display");
+  showStatus(title, "concluido com sucesso!");
+}
