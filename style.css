@@ -6,33 +6,31 @@
 
 .is-light {
   --bg-container: rgba(255, 255, 255, 0.9);
-  --bg-upload: rgba(102, 126, 234, 0.1);
-  --bg-upload-hover: rgba(118, 75, 162, 0.1);
   --bg-image-container: #ffffff;
   --bg-color-info: rgba(102, 126, 234, 0.1);
   --bg-color-value: #ffffff;
-  --bg-input: #ffffff;
   --bg-sidebar: #3f4958;
+  --bg-fieldset: rgba(102, 126, 234, 0.05);
 
   --text-primary: #333333;
-  --text-upload: #667eea;
-  --text-color-title: #667eea;
 
   --border-upload: #1588e6;
   --border-upload-hover: #764ba2;
   --border-input: #ddd;
   --border-input-focus: #667eea;
+  --border-fieldset: rgba(102, 126, 234, 0.2);
 
   --btn-operation: #1588e6;
   --btn-clear: #d30606b6;
   --btn-save: #04b112a2;
-  --btn-hover-shadow: rgba(102, 126, 234, 0.4);
 
+  --btn-hover-shadow: rgba(102, 126, 234, 0.4);
   --shadow-container: rgba(0, 0, 0, 0.2);
   --shadow-image: rgba(0, 0, 0, 0.1);
   --shadow-canvas: rgba(0, 0, 0, 0.2);
   --shadow-color-value: rgba(0, 0, 0, 0.1);
   --shadow-upload: rgba(102, 126, 234, 0.2);
+  --shadow-fieldset: rgba(0, 0, 0, 0.1);
 
   --success-bg: rgba(46, 204, 113, 0.1);
   --success-color: #27ae60;
@@ -43,25 +41,23 @@
   --error-border: rgba(231, 76, 60, 0.3);
 }
 
+/* ===== VARIÁVEIS DE TEMA (MODO ESCURO) ===== */
 .is-dark {
   --bg-body: #293445;
   --bg-container: rgba(30, 41, 59, 0.95);
-  --bg-upload: rgba(124, 58, 237, 0.2);
-  --bg-upload-hover: rgba(139, 92, 246, 0.2);
   --bg-image-container: #334155;
   --bg-color-info: rgba(124, 58, 237, 0.2);
   --bg-color-value: #475569;
-  --bg-input: #475569;
   --bg-sidebar: #3f4958;
+  --bg-fieldset: rgba(124, 58, 237, 0.1);
 
   --text-primary: #f1f5f9;
-  --text-upload: #a78bfa;
-  --text-color-title: #a78bfa;
 
   --border-upload: #7c3aed;
   --border-upload-hover: #8b5cf6;
   --border-input: #64748b;
   --border-input-focus: #a78bfa;
+  --border-fieldset: rgba(124, 58, 237, 0.3);
 
   --btn-operation: #7c3aed;
   --btn-clear: #d30606b6;
@@ -73,6 +69,7 @@
   --shadow-canvas: rgba(0, 0, 0, 0.4);
   --shadow-color-value: rgba(0, 0, 0, 0.2);
   --shadow-upload: rgba(124, 58, 237, 0.3);
+  --shadow-fieldset: rgba(0, 0, 0, 0.2);
 
   --success-bg: rgba(34, 197, 94, 0.2);
   --success-color: #4ade80;
@@ -83,6 +80,7 @@
   --error-border: rgba(239, 68, 68, 0.4);
 }
 
+/* ===== CONFIGURAÇÕES BÁSICAS DO BODY ===== */
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg-body);
@@ -90,11 +88,13 @@ body {
   transition: all 0.3s ease;
 }
 
+/* ===== LAYOUT PRINCIPAL ===== */
 .container {
   display: flex;
   min-height: 100vh;
 }
 
+/* ===== SIDEBAR (MENU LATERAL) ===== */
 .sidebar {
   width: 280px;
   background-color: var(--bg-sidebar);
@@ -144,7 +144,6 @@ body {
 
 .menu-item:hover {
   background: rgba(255, 255, 255, 0.1);
-  border-left-color: #fff;
 }
 
 .menu-item[data-active="true"] {
@@ -153,35 +152,13 @@ body {
   font-weight: 600;
 }
 
-/* Botão de tema no sidebar */
-.theme-toggle {
-  position: fixed;
-  top: 1rem;
-  right: 0.5rem;
-  background: var(--btn-operation);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 12px 20px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 5px 15px var(--btn-hover-shadow);
-  transition: all 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px var(--btn-hover-shadow);
-}
-
-/* Conteúdo Principal */
+/* ===== CONTEÚDO PRINCIPAL ===== */
 .main-content {
   flex: 1;
   padding: 2rem;
 }
 
-/* Seção Fixa */
+/* ===== SEÇÃO FIXA (UPLOAD DE IMAGENS) ===== */
 .fixed-section {
   background: var(--bg-container);
   border-radius: 15px;
@@ -194,12 +171,13 @@ body {
 .fixed-section h1 {
   color: var(--text-primary);
   margin-bottom: 20px;
-  font-size: 2.2rem;
+  font-size: 1rem;
   text-align: center;
 }
 
+/* ===== SEÇÕES DE CONTEÚDO ===== */
 .content-section {
-  display: none;
+  display: flex;
   background: var(--bg-container);
   border-radius: 15px;
   padding: 30px;
@@ -208,18 +186,23 @@ body {
   backdrop-filter: blur(10px);
 }
 
+.content-section[data-active="false"] {
+  display: none;
+}
+
 .content-section[data-active="true"] {
-  display: block;
+  display: flex;
+  justify-content: center;
 }
 
 .content-section h2 {
   color: var(--text-primary);
   margin-bottom: 20px;
-  font-size: 1.8rem;
+  font-size: 1rem;
   text-align: center;
 }
 
-/* Upload Section */
+/* ===== ÁREA DE UPLOAD ===== */
 .upload-section {
   display: grid;
   grid-template-columns: 1fr;
@@ -247,8 +230,6 @@ body {
 }
 
 .upload-box:hover {
-  border-color: var(--border-upload-hover);
-  background: var(--bg-upload-hover);
   transform: translateY(-2.5px);
   box-shadow: 0 10px 20px var(--shadow-upload);
 }
@@ -264,10 +245,58 @@ body {
 }
 
 .upload-text {
-  font-size: 1.5rem;
-  color: var(--text-upload);
+  font-size: 1.2rem;
+  color: var(--text-primary);
   font-weight: 600;
   transition: color 0.3s ease;
+}
+
+/* ===== CONTROLES E FIELDSETS ===== */
+.controls {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.control-fieldset {
+  background: var(--bg-fieldset);
+  border: 2px solid var(--border-fieldset);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 5px 15px var(--shadow-fieldset);
+  transition: all 0.3s ease;
+}
+
+.control-fieldset legend {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0 15px;
+  margin-bottom: 10px;
+}
+
+.fieldset-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  min-width: fit-content;
+}
+
+.control-group-inline {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .controls-btn {
@@ -284,21 +313,13 @@ body {
   margin-bottom: 10px;
 }
 
-.controls {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-  padding: 20px;
-  border-radius: 15px;
-}
-
 .control-values {
   display: flex;
   flex-direction: row;
   gap: 10px;
 }
 
+/* ===== LABELS E INPUTS ===== */
 label {
   font-weight: 600;
   color: var(--text-primary);
@@ -309,12 +330,13 @@ label {
 input[type="number"],
 .valueSelector {
   padding: 10px;
-  border: 2px solid var(--border-input);
+  border: 1px solid var(--border-input);
   border-radius: 15px;
   font-size: 1rem;
-  background: var(--bg-input);
+  background: var(--bg-body);
   color: var(--text-primary);
   transition: all 0.3s ease;
+  min-width: 100px;
 }
 
 input[type="number"]:focus,
@@ -324,6 +346,7 @@ input[type="number"]:focus,
   box-shadow: 0 0 0 3px var(--bg-upload);
 }
 
+/* ===== BOTÕES ===== */
 button {
   padding: 12px 24px;
   border: none;
@@ -333,6 +356,7 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
   color: white;
+  white-space: nowrap;
 }
 
 .btn-operation {
@@ -354,7 +378,7 @@ button {
   box-shadow: 0 5px 15px var(--btn-hover-shadow);
 }
 
-/* Images Display */
+/* ===== DISPLAY DE IMAGENS ===== */
 .images-display {
   display: flex;
   flex-wrap: wrap;
@@ -392,12 +416,14 @@ button {
   margin: 0 auto;
 }
 
+/* ===== INFORMAÇÕES DE COR ===== */
 .color-info {
   background: var(--bg-color-info);
   border-radius: 15px;
   padding: 20px;
   margin-top: 30px;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .color-info h3 {
@@ -424,7 +450,7 @@ button {
 }
 
 .color-value h4 {
-  color: var(--text-color-title);
+  color: var(--text-primary);
   margin-bottom: 10px;
   font-size: 1.1rem;
   transition: color 0.3s ease;
@@ -437,8 +463,8 @@ button {
   transition: color 0.3s ease;
 }
 
-/* Status Messages */
-.status {
+/* ===== MENSAGENS DE STATUS ===== */
+#status {
   text-align: center;
   padding: 15px;
   border-radius: 10px;
@@ -447,23 +473,23 @@ button {
   transition: all 0.3s ease;
   position: fixed;
   top: 20px;
-  right: 20px;
-  z-index: 1001;
+  left: 50%;
   max-width: 300px;
 }
 
-.status.success {
+#status[data-type="sucess"] {
   background: var(--success-bg);
   color: var(--success-color);
   border: 1px solid var(--success-border);
 }
 
-.status.error {
+#status[data-type="erro"] {
   background: var(--error-bg);
   color: var(--error-color);
   border: 1px solid var(--error-border);
 }
 
+/* ===== ANIMAÇÕES ===== */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -475,7 +501,7 @@ button {
   }
 }
 
-/* Mobile */
+/* ===== RESPONSIVIDADE (MOBILE) ===== */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
@@ -511,6 +537,16 @@ button {
 
   .controls-btn {
     grid-template-columns: 1fr;
+  }
+
+  .fieldset-content {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .control-group-inline {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 

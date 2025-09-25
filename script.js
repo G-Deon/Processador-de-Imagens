@@ -4,9 +4,6 @@ let canvas1 = null;
 let canvas2 = null;
 let resultCanvas = null;
 
-const themeBtn = document.getElementById("themeToggle");
-themeBtn.addEventListener("click", switchTheme);
-
 document.getElementById("image1").addEventListener("click", function (e) {
   e.target.value = "";
 });
@@ -22,16 +19,6 @@ document.getElementById("image2").addEventListener("click", function (e) {
 document.getElementById("image2").addEventListener("change", function (e) {
   loadImage(e.target.files[0], 2);
 });
-
-function switchTheme() {
-  document.body.classList.toggle("is-light");
-  document.body.classList.toggle("is-dark");
-  if (document.body.classList.contains("is-light")) {
-    themeBtn.innerText = "🌙 Escuro";
-  } else {
-    themeBtn.innerText = "☀️ Claro";
-  }
-}
 
 function setAtive(ev) {
   const targetId = ev.currentTarget.dataset.target;
@@ -270,12 +257,13 @@ function clearImg() {
   canvas2 = null;
   resultCanvas = null;
 
-  document.getElementById("colorInfo").style.display = "none";
-
+  document.getElementById("rgbValue").textContent = "-";
+  document.getElementById("cmykValue").textContent = "-";
+  document.getElementById("hslValue").textContent = "-";
   document.getElementById("image1").value = "";
   document.getElementById("image2").value = "";
 
-  showStatus("Imagens removidas com sucesso!");
+  showStatus("Imagens removidas com sucesso!", "erro");
 }
 
 function saveImg() {
@@ -286,6 +274,24 @@ function saveImg() {
   link.download = "result.png";
   link.href = canvasUrl;
   link.click();
+}
+
+function showStatus(mensagem, tipo) {
+  const main = document.querySelector("main");
+  const status = document.createElement("div");
+
+  status.innerText = mensagem;
+  status.id = "status";
+  status.dataset.type = tipo;
+
+  main.appendChild(status);
+
+  setTimeout(function () {
+    elemento = document.getElementById("status");
+    if (elemento) {
+      elemento.remove();
+    }
+  }, 5000);
 }
 
 function addImages() {
