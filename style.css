@@ -319,6 +319,44 @@ body {
   gap: 10px;
 }
 
+/* Estilos para os histogramas */
+.histogram-canvas {
+  border: 2px solid var(--border-fieldset);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--shadow-canvas);
+  margin: 10px auto;
+  display: block;
+}
+
+/* Ajustes para o fieldset de histograma */
+#sec5 .control-fieldset {
+  min-width: 300px;
+  min-height: 250px;
+  display: flex;
+  flex-direction: row;
+}
+
+#sec5 .fieldset-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* Centralização dos controles na seção 5 */
+#sec5 .controls {
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 20px;
+}
+
+#sec5 .control-group-inline {
+  justify-content: center;
+  margin: 20px 0;
+}
+
 /* ===== LABELS E INPUTS ===== */
 label {
   font-weight: 600;
@@ -503,6 +541,20 @@ button {
 
 /* ===== RESPONSIVIDADE (MOBILE) ===== */
 @media (max-width: 768px) {
+  .histogram-canvas {
+    max-width: 100%;
+    height: auto;
+  }
+
+  #sec5 .controls {
+    flex-direction: column;
+  }
+
+  #sec5 .control-fieldset {
+    min-width: auto;
+    width: 100%;
+  }
+
   .sidebar {
     transform: translateX(-100%);
     z-index: 1000;

@@ -366,6 +366,25 @@ function grayTransform() {
   processImageWithValue("gray", value);
 }
 
+function binaryConvert() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const value = parseInt(document.getElementById("binaryValue").value);
+  processImageWithValue("binary", value);
+}
+
+function negativeTransform() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+  const value = 255;
+  processImageWithValue("negative", value);
+}
+
 function processImages(operation) {
   const width = Math.min(image1Data.width, image2Data.width);
   const height = Math.min(image1Data.height, image2Data.height);
@@ -460,6 +479,17 @@ function processImageWithValue(operation, value) {
         resultData[i + 2] = Math.max(0, (r + g + b) / value);
         resultData[i + 3] = a;
         break;
+      case "negative":
+        resultData[i] = Math.max(0, value - r);
+        resultData[i + 1] = Math.max(0, value - g);
+        resultData[i + 2] = Math.max(0, value - b);
+        resultData[i + 3] = a;
+        break;
+      case "binary":
+        resultData[i] = Math.max(0, (r + g + b) / 3) > value ? 255 : 0;
+        resultData[i + 1] = Math.max(0, (r + g + b) / 3) > value ? 255 : 0;
+        resultData[i + 2] = Math.max(0, (r + g + b) / 3) > value ? 255 : 0;
+        resultData[i + 3] = a;
     }
   }
 
@@ -558,7 +588,7 @@ function difference() {
   displayImage(canvas, "Diferença das imagens", "result-display");
 }
 
-function Blending() {
+function blending() {
   const width = Math.min(image1Data.width, image2Data.width);
   const height = Math.min(image1Data.height, image2Data.height);
 
@@ -592,4 +622,531 @@ function Blending() {
   ctx.putImageData(resultImageData, 0, 0);
   let title = "Blending " + value;
   displayImage(canvas, title, "result-display");
+}
+
+function media() {
+  const width = Math.min(image1Data.width, image2Data.width);
+  const height = Math.min(image1Data.height, image2Data.height);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < width * height * 4; i += 4) {
+    const r1 = image1Data.data[i];
+    const g1 = image1Data.data[i + 1];
+    const b1 = image1Data.data[i + 2];
+    const a1 = image1Data.data[i + 3];
+
+    const r2 = image2Data.data[i];
+    const g2 = image2Data.data[i + 1];
+    const b2 = image2Data.data[i + 2];
+    const a2 = image2Data.data[i + 3];
+
+    resultData[i] = Math.min(255, (r1 + r2) / 2);
+    resultData[i + 1] = Math.min(255, (g1 + g2) / 2);
+    resultData[i + 2] = Math.min(255, (b1 + b2) / 2);
+    resultData[i + 3] = Math.min(a1, a2);
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  let title = "Media";
+  displayImage(canvas, title, "result-display");
+}
+
+function andLogic() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+  if (!image2Data) {
+    showStatus("Por favor, carregue a segunda imagem!", "error");
+    return;
+  }
+  logicProcess("and");
+}
+
+function orLogic() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+  if (!image2Data) {
+    showStatus("Por favor, carregue a segunda imagem!", "error");
+    return;
+  }
+  logicProcess("or");
+}
+
+function notLogic() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+  logicProcess("not");
+}
+
+function xorLogic() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+  if (!image2Data) {
+    showStatus("Por favor, carregue a segunda imagem!", "error");
+    return;
+  }
+  logicProcess("xor");
+}
+
+function logicProcess(operation) {
+  if (operation === "not") {
+    const width = image1Data.width;
+    const height = image1Data.height;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    const resultImageData = ctx.createImageData(width, height);
+    const resultData = resultImageData.data;
+
+    for (let i = 0; i < width * height * 4; i += 4) {
+      const r1 = image1Data.data[i];
+      const g1 = image1Data.data[i + 1];
+      const b1 = image1Data.data[i + 2];
+      const a1 = image1Data.data[i + 3];
+
+      if (r1 === 0) {
+        resultData[i] = 255;
+        resultData[i + 1] = 255;
+        resultData[i + 2] = 255;
+      } else {
+        resultData[i] = 0;
+        resultData[i + 1] = 0;
+        resultData[i + 2] = 0;
+      }
+      resultData[i + 3] = a1;
+    }
+    ctx.putImageData(resultImageData, 0, 0);
+    displayImage(canvas, "Resultado: NOT", "result-display");
+  } else {
+    const width = Math.min(image1Data.width, image2Data.width);
+    const height = Math.min(image1Data.height, image2Data.height);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    const resultImageData = ctx.createImageData(width, height);
+    const resultData = resultImageData.data;
+
+    for (let i = 0; i < width * height * 4; i += 4) {
+      const r1 = image1Data.data[i];
+      const g1 = image1Data.data[i + 1];
+      const b1 = image1Data.data[i + 2];
+      const a1 = image1Data.data[i + 3];
+
+      const r2 = image2Data.data[i];
+      const a2 = image2Data.data[i + 3];
+
+      switch (operation) {
+        case "and":
+          if (r1 === r2) {
+            resultData[i] = r1;
+            resultData[i + 1] = g1;
+            resultData[i + 2] = b1;
+          } else {
+            resultData[i] = 0;
+            resultData[i + 1] = 0;
+            resultData[i + 2] = 0;
+          }
+          break;
+
+        case "or":
+          if (r1 === r2) {
+            resultData[i] = r1;
+            resultData[i + 1] = g1;
+            resultData[i + 2] = b1;
+          } else {
+            resultData[i] = 255;
+            resultData[i + 1] = 255;
+            resultData[i + 2] = 255;
+          }
+          break;
+
+        case "xor":
+          if (r1 === r2) {
+            resultData[i] = 0;
+            resultData[i + 1] = 0;
+            resultData[i + 2] = 0;
+          } else {
+            resultData[i] = 255;
+            resultData[i + 1] = 255;
+            resultData[i + 2] = 255;
+          }
+          break;
+      }
+      resultData[i + 3] = Math.min(a1, a2);
+    }
+    ctx.putImageData(resultImageData, 0, 0);
+    let title;
+    if (operation === "or") title = "Resultado: OR";
+    if (operation === "xor") title = "Resultado: XOR";
+    if (operation === "and") title = "Resultado: AND";
+    displayImage(canvas, title, "result-display");
+  }
+}
+
+function calculateHistogram(imageData) {
+  const histogram = {
+    red: new Array(256).fill(0),
+    green: new Array(256).fill(0),
+    blue: new Array(256).fill(0),
+    gray: new Array(256).fill(0),
+  };
+
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    histogram.red[r]++;
+    histogram.green[g]++;
+    histogram.blue[b]++;
+
+    const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+    histogram.gray[gray]++;
+  }
+
+  return histogram;
+}
+
+function drawHistogram(histogram, canvasId, title) {
+  const existingCanvas = document.getElementById(canvasId);
+  if (existingCanvas) {
+    existingCanvas.remove();
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.id = canvasId;
+  canvas.width = 512;
+  canvas.height = 200;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const maxValue = Math.max(
+    ...histogram.red,
+    ...histogram.green,
+    ...histogram.blue,
+    ...histogram.gray
+  );
+
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+
+  for (let i = 0; i < 256; i++) {
+    const x = i * 2;
+    const height = (histogram.gray[i] / maxValue) * (canvas.height - 20);
+    const y = canvas.height - height;
+
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+
+  ctx.fillStyle = "black";
+  ctx.font = "14px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(title, canvas.width / 2, 15);
+
+  ctx.font = "10px Arial";
+  ctx.fillText("0", 10, canvas.height - 5);
+  ctx.fillText("255", canvas.width - 20, canvas.height - 5);
+
+  return canvas;
+}
+
+function showHistogramBefore() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const histogram = calculateHistogram(image1Data);
+
+  const histogramCanvas = drawHistogram(
+    histogram,
+    "histogram-before",
+    "Histograma - Antes"
+  );
+
+  const beforeFieldset = document.querySelector(
+    "#sec5 fieldset:first-child .fieldset-content"
+  );
+  beforeFieldset.innerHTML = "";
+  beforeFieldset.appendChild(histogramCanvas);
+}
+
+function equalizeHistogram() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  showHistogramBefore();
+
+  const originalHistogram = calculateHistogram(image1Data);
+
+  const cdf = new Array(256).fill(0);
+  cdf[0] = originalHistogram.gray[0];
+
+  for (let i = 1; i < 256; i++) {
+    cdf[i] = cdf[i - 1] + originalHistogram.gray[i];
+  }
+
+
+  const totalPixels = image1Data.width * image1Data.height;
+  const normalizedCdf = cdf.map((value) =>
+    Math.round((value / totalPixels) * 255)
+  );
+
+  const canvas = document.createElement("canvas");
+  canvas.width = image1Data.width;
+  canvas.height = image1Data.height;
+  const ctx = canvas.getContext("2d");
+
+  const equalizedImageData = ctx.createImageData(
+    image1Data.width,
+    image1Data.height
+  );
+  const equalizedData = equalizedImageData.data;
+
+  for (let i = 0; i < image1Data.data.length; i += 4) {
+    const r = image1Data.data[i];
+    const g = image1Data.data[i + 1];
+    const b = image1Data.data[i + 2];
+    const a = image1Data.data[i + 3];
+
+    const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+    const newGray = normalizedCdf[gray];
+
+    const factor = newGray / (gray || 1);
+
+    equalizedData[i] = Math.min(255, Math.max(0, Math.round(r * factor)));
+    equalizedData[i + 1] = Math.min(255, Math.max(0, Math.round(g * factor)));
+    equalizedData[i + 2] = Math.min(255, Math.max(0, Math.round(b * factor)));
+    equalizedData[i + 3] = a;
+  }
+
+  ctx.putImageData(equalizedImageData, 0, 0);
+
+
+  displayImage(canvas, "Imagem Equalizada", "equalized-result");
+
+  const equalizedHistogram = calculateHistogram(equalizedImageData);
+  const histogramAfter = drawHistogram(
+    equalizedHistogram,
+    "histogram-after",
+    "Histograma - Depois"
+  );
+
+  const afterFieldset = document.querySelector(
+    "#sec5 fieldset:last-child .fieldset-content"
+  );
+  afterFieldset.innerHTML = "";
+  afterFieldset.appendChild(histogramAfter);
+
+  showStatus("Equalização de histograma concluída com sucesso!", "sucess");
+}
+
+function max3x3() {
+  applyMaxFilter(3);
+}
+
+function max5x5() {
+  applyMaxFilter(5);
+}
+
+function max7x7() {
+  applyMaxFilter(7);
+}
+
+function applyMaxFilter(kernelSize) {
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let maxR = 0,
+        maxG = 0,
+        maxB = 0;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          const nx = x + kx;
+          const ny = y + ky;
+
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const i = (ny * width + nx) * 4;
+            maxR = Math.max(maxR, image1Data.data[i]);
+            maxG = Math.max(maxG, image1Data.data[i + 1]);
+            maxB = Math.max(maxB, image1Data.data[i + 2]);
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = maxR;
+      resultData[i + 1] = maxG;
+      resultData[i + 2] = maxB;
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, `Máximo ${kernelSize}x${kernelSize}`, "result-display");
+}
+
+function min3x3() {
+  applyMinFilter(3);
+}
+
+function min5x5() {
+  applyMinFilter(5);
+}
+
+function min7x7() {
+  applyMinFilter(7);
+}
+
+function applyMinFilter(kernelSize) {
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let minR = 255,
+        minG = 255,
+        minB = 255;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          const nx = x + kx;
+          const ny = y + ky;
+
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const i = (ny * width + nx) * 4;
+            minR = Math.min(minR, image1Data.data[i]);
+            minG = Math.min(minG, image1Data.data[i + 1]);
+            minB = Math.min(minB, image1Data.data[i + 2]);
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = minR;
+      resultData[i + 1] = minG;
+      resultData[i + 2] = minB;
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, `Mínimo ${kernelSize}x${kernelSize}`, "result-display");
+}
+
+
+function mean3x3() {
+  applyMeanFilter(3);
+}
+
+function mean5x5() {
+  applyMeanFilter(5);
+}
+
+function mean7x7() {
+  applyMeanFilter(7);
+}
+
+function applyMeanFilter(kernelSize) {
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let sumR = 0,
+        sumG = 0,
+        sumB = 0,
+        count = 0;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          const nx = x + kx;
+          const ny = y + ky;
+
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const i = (ny * width + nx) * 4;
+            sumR += image1Data.data[i];
+            sumG += image1Data.data[i + 1];
+            sumB += image1Data.data[i + 2];
+            count++;
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = Math.round(sumR / count);
+      resultData[i + 1] = Math.round(sumG / count);
+      resultData[i + 2] = Math.round(sumB / count);
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, `Média ${kernelSize}x${kernelSize}`, "result-display");
 }

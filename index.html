@@ -44,7 +44,7 @@
           class="menu-item"
           data-active="false"
           onclick="setAtive(event)"
-          >Função 4</a
+          >Operações Lógicas e Binárias</a
         >
         <a
           data-target="sec5"
@@ -52,7 +52,7 @@
           class="menu-item"
           data-active="false"
           onclick="setAtive(event)"
-          >Função 5</a
+          >Processamento de Histograma</a
         >
         <a
           data-target="sec6"
@@ -60,7 +60,7 @@
           class="menu-item"
           data-active="false"
           onclick="setAtive(event)"
-          >Função 6</a
+          >Filtragem Espacial (Passa-Baixa)</a
         >
         <a
           data-target="sec7"
@@ -208,6 +208,9 @@
                   <button class="btn-operation" onclick="grayTransform()">
                     Escala de Cinza
                   </button>
+                  <button class="btn-operation" onclick="negativeTransform()">
+                    Negativo
+                  </button>
                 </div>
               </div>
             </fieldset>
@@ -259,11 +262,53 @@
                   />
                 </div>
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="Blending()">
-                    Combinação Linear (Blending)
+                  <button class="btn-operation" onclick="blending()">
+                    Blending
                   </button>
-                  <button class="btn-operation" onclick="averageImages()">
-                    Combinação Linear (Média)
+                  <button class="btn-operation" onclick="media()">Média</button>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </section>
+
+        <section id="sec4" class="content-section" data-active="false">
+          <div class="controls">
+            <fieldset class="control-fieldset">
+              <legend>Operações lógicas</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="andLogic()">
+                    AND
+                  </button>
+                  <button class="btn-operation" onclick="orLogic()">OR</button>
+                  <button class="btn-operation" onclick="notLogic()">
+                    NOT
+                  </button>
+                  <button class="btn-operation" onclick="xorLogic()">
+                    XOR
+                  </button>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="control-fieldset">
+              <legend>Limiarização de imagens.</legend>
+              <div class="fieldset-content">
+                <div class="control-group">
+                  <label for="binaryValue">Valor (0-1):</label>
+                  <input
+                    type="number"
+                    id="binaryValue"
+                    value="0"
+                    min="0"
+                    max="255"
+                    step="1"
+                  />
+                </div>
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="binaryConvert()">
+                    Converter para Binário
                   </button>
                 </div>
               </div>
@@ -271,23 +316,58 @@
           </div>
         </section>
 
-        <section
-          id="sec4"
-          class="content-section"
-          data-active="false"
-        ></section>
+        <section id="sec5" class="content-section" data-active="false">
+          <div class="controls">
+            <fieldset class="control-fieldset">
+              <legend>Antes</legend>
+              <div class="fieldset-content"></div>
+            </fieldset>
+            <div class="control-group-inline">
+              <button class="btn-operation" onclick="equalizeHistogram()">
+                Equalizar
+              </button>
+            </div>
+            <fieldset class="control-fieldset">
+              <legend>Depois</legend>
+              <div class="fieldset-content"></div>
+            </fieldset>
+          </div>
+        </section>
 
-        <section
-          id="sec5"
-          class="content-section"
-          data-active="false"
-        ></section>
-
-        <section
-          id="sec6"
-          class="content-section"
-          data-active="false"
-        ></section>
+        <section id="sec6" class="content-section" data-active="false">
+          <div class="controls">
+            <fieldset class="control-fieldset">
+              <legend>Filtro MAX</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="max3x3()">3x3</button>
+                  <button class="btn-operation" onclick="max5x5()">5x5</button>
+                  <button class="btn-operation" onclick="max7x7()">7x7</button>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="control-fieldset">
+              <legend>Filtro MIN</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="min3x3()">3x3</button>
+                  <button class="btn-operation" onclick="min5x5()">5x5</button>
+                  <button class="btn-operation" onclick="min7x7()">7x7</button>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="control-fieldset">
+              <legend>Filtro MEAN</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="mean3x3()">3x3</button>
+                  <button class="btn-operation" onclick="mean5x5()">5x5</button>
+                  <button class="btn-operation" onclick="mean7x7()">7x7</button>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </section>
 
         <section
           id="sec7"
