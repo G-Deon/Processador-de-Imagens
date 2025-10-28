@@ -72,21 +72,63 @@ function loadImage(file, imageNumber) {
 function loadTiffImage(file, imageNumber) {
   const reader = new FileReader();
   reader.onload = function (e) {
-    const tiff = new Tiff({ buffer: e.target.result });
-    const canvas = tiff.toCanvas();
-    const ctx = canvas.getContext("2d");
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    try {
+      // Verifica se a biblioteca Tiff está disponível
+      if (typeof Tiff === "undefined") {
+        showStatus(
+          "Biblioteca TIFF não carregada! Verifique a conexão com a internet.",
+          "error"
+        );
+        console.error("Tiff.js não está disponível");
+        return;
+      }
 
-    if (imageNumber === 1) {
-      image1Data = imageData;
-      canvas1 = canvas;
-      displayImage(canvas, "Imagem TIFF 1", "image1-display");
-    } else {
-      image2Data = imageData;
-      canvas2 = canvas;
-      displayImage(canvas, "Imagem TIFF 2", "image2-display");
+      console.log("Carregando arquivo TIFF...");
+
+      // Inicializa a biblioteca TIFF com mais memória
+      Tiff.initialize({ TOTAL_MEMORY: 16777216 * 10 });
+
+      // Cria o objeto TIFF a partir do buffer
+      const tiff = new Tiff({ buffer: e.target.result });
+
+      console.log("TIFF carregado, convertendo para canvas...");
+
+      // Converte para canvas
+      const canvas = tiff.toCanvas();
+
+      if (!canvas) {
+        showStatus("Erro ao converter TIFF para canvas!", "error");
+        return;
+      }
+
+      console.log("Canvas criado:", canvas.width + "x" + canvas.height);
+
+      const ctx = canvas.getContext("2d");
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      if (imageNumber === 1) {
+        image1Data = imageData;
+        canvas1 = canvas;
+        displayImage(canvas, "Imagem TIFF 1", "image1-display");
+        showStatus("Imagem TIFF 1 carregada com sucesso!", "sucess");
+      } else {
+        image2Data = imageData;
+        canvas2 = canvas;
+        displayImage(canvas, "Imagem TIFF 2", "image2-display");
+        showStatus("Imagem TIFF 2 carregada com sucesso!", "sucess");
+      }
+    } catch (error) {
+      showStatus("Erro ao carregar arquivo TIFF: " + error.message, "error");
+      console.error("Erro detalhado TIFF:", error);
+      console.error("Stack trace:", error.stack);
     }
   };
+
+  reader.onerror = function (error) {
+    showStatus("Erro ao ler o arquivo: " + error, "error");
+    console.error("Erro ao ler arquivo:", error);
+  };
+
   reader.readAsArrayBuffer(file);
 }
 
@@ -919,7 +961,6 @@ function equalizeHistogram() {
     cdf[i] = cdf[i - 1] + originalHistogram.gray[i];
   }
 
-
   const totalPixels = image1Data.width * image1Data.height;
   const normalizedCdf = cdf.map((value) =>
     Math.round((value / totalPixels) * 255)
@@ -954,7 +995,6 @@ function equalizeHistogram() {
   }
 
   ctx.putImageData(equalizedImageData, 0, 0);
-
 
   displayImage(canvas, "Imagem Equalizada", "equalized-result");
 
@@ -1090,7 +1130,6 @@ function applyMinFilter(kernelSize) {
   displayImage(canvas, `Mínimo ${kernelSize}x${kernelSize}`, "result-display");
 }
 
-
 function mean3x3() {
   applyMeanFilter(3);
 }
@@ -1149,4 +1188,337 @@ function applyMeanFilter(kernelSize) {
 
   ctx.putImageData(resultImageData, 0, 0);
   displayImage(canvas, `Média ${kernelSize}x${kernelSize}`, "result-display");
+}
+
+function median3x3() {
+  applyMedianFilter(3);
+}
+
+function median5x5() {
+  applyMedianFilter(5);
+}
+
+function median7x7() {
+  applyMedianFilter(7);
+}
+
+function applyMedianFilter(kernelSize) {
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const valuesR = [];
+      const valuesG = [];
+      const valuesB = [];
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          const nx = x + kx;
+          const ny = y + ky;
+
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const i = (ny * width + nx) * 4;
+            valuesR.push(image1Data.data[i]);
+            valuesG.push(image1Data.data[i + 1]);
+            valuesB.push(image1Data.data[i + 2]);
+          }
+        }
+      }
+
+      valuesR.sort((a, b) => a - b);
+      valuesG.sort((a, b) => a - b);
+      valuesB.sort((a, b) => a - b);
+
+      const medianIndex = Math.floor(valuesR.length / 2);
+
+      const i = (y * width + x) * 4;
+      resultData[i] = valuesR[medianIndex];
+      resultData[i + 1] = valuesG[medianIndex];
+      resultData[i + 2] = valuesB[medianIndex];
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, `Mediana ${kernelSize}x${kernelSize}`, "result-display");
+}
+
+function suacon3x3() {
+  applySuaConFilter(3);
+}
+
+function suacon5x5() {
+  applySuaConFilter(5);
+}
+
+function suacon7x7() {
+  applySuaConFilter(7);
+}
+
+function applySuaConFilter(kernelSize) {
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const valuesR = [];
+      const valuesG = [];
+      const valuesB = [];
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (ky === 0 && kx === 0) {
+            continue;
+          }
+          const nx = x + kx;
+          const ny = y + ky;
+
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const i = (ny * width + nx) * 4;
+            valuesR.push(image1Data.data[i]);
+            valuesG.push(image1Data.data[i + 1]);
+            valuesB.push(image1Data.data[i + 2]);
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      const centerR = image1Data.data[i];
+      const centerG = image1Data.data[i + 1];
+      const centerB = image1Data.data[i + 2];
+
+      const minR = Math.min(...valuesR);
+      const maxR = Math.max(...valuesR);
+      const minG = Math.min(...valuesG);
+      const maxG = Math.max(...valuesG);
+      const minB = Math.min(...valuesB);
+      const maxB = Math.max(...valuesB);
+
+      if (centerR < minR || centerR > maxR) {
+        valuesR.sort((a, b) => a - b);
+        resultData[i] = valuesR[Math.floor(valuesR.length / 2)];
+      } else {
+        resultData[i] = centerR;
+      }
+
+      if (centerG < minG || centerG > maxG) {
+        valuesG.sort((a, b) => a - b);
+        resultData[i + 1] = valuesG[Math.floor(valuesG.length / 2)];
+      } else {
+        resultData[i + 1] = centerG;
+      }
+
+      if (centerB < minB || centerB > maxB) {
+        valuesB.sort((a, b) => a - b);
+        resultData[i + 2] = valuesB[Math.floor(valuesB.length / 2)];
+      } else {
+        resultData[i + 2] = centerB;
+      }
+
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, `Mediana ${kernelSize}x${kernelSize}`, "result-display");
+}
+
+function ordem3x3() {
+  applyOrdemFilter(3);
+}
+
+function ordem5x5() {
+  applyOrdemFilter(5);
+}
+
+function ordem7x7() {
+  applyOrdemFilter(7);
+}
+
+function applyOrdemFilter(kernelSize) {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  const totalElements = kernelSize * kernelSize;
+  const rank = Math.floor(totalElements / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const valuesR = [];
+      const valuesG = [];
+      const valuesB = [];
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          const nx = x + kx;
+          const ny = y + ky;
+
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const i = (ny * width + nx) * 4;
+            valuesR.push(image1Data.data[i]);
+            valuesG.push(image1Data.data[i + 1]);
+            valuesB.push(image1Data.data[i + 2]);
+          }
+        }
+      }
+
+      valuesR.sort((a, b) => a - b);
+      valuesG.sort((a, b) => a - b);
+      valuesB.sort((a, b) => a - b);
+
+      const i = (y * width + x) * 4;
+      resultData[i] = valuesR[rank];
+      resultData[i + 1] = valuesG[rank];
+      resultData[i + 2] = valuesB[rank];
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(
+    canvas,
+    `Ordem ${kernelSize}x${kernelSize} (rank=${rank})`,
+    "result-display"
+  );
+  showStatus(`Filtro de Ordem ${kernelSize}x${kernelSize} aplicado!`, "sucess");
+}
+
+function gaussiano3x3() {
+  applyGaussianFilter(3);
+}
+
+function gaussiano5x5() {
+  applyGaussianFilter(5);
+}
+
+function gaussiano7x7() {
+  applyGaussianFilter(7);
+}
+
+function applyGaussianFilter(kernelSize) {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const kernel = generateGaussianKernel(kernelSize);
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let sumR = 0,
+        sumG = 0,
+        sumB = 0;
+      let sumWeights = 0;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          const nx = x + kx;
+          const ny = y + ky;
+
+          if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+            const i = (ny * width + nx) * 4;
+            const weight = kernel[ky + halfKernel][kx + halfKernel];
+
+            sumR += image1Data.data[i] * weight;
+            sumG += image1Data.data[i + 1] * weight;
+            sumB += image1Data.data[i + 2] * weight;
+            sumWeights += weight;
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = Math.round(sumR / sumWeights);
+      resultData[i + 1] = Math.round(sumG / sumWeights);
+      resultData[i + 2] = Math.round(sumB / sumWeights);
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(
+    canvas,
+    `Gaussiano ${kernelSize}x${kernelSize}`,
+    "result-display"
+  );
+  showStatus(
+    `Filtro Gaussiano ${kernelSize}x${kernelSize} aplicado!`,
+    "sucess"
+  );
+}
+
+function generateGaussianKernel(size) {
+  const kernel = [];
+  const sigma = size / 6.0;
+  const mean = Math.floor(size / 2);
+  let sum = 0;
+
+  for (let y = 0; y < size; y++) {
+    kernel[y] = [];
+    for (let x = 0; x < size; x++) {
+      const exponent = -(
+        (Math.pow(x - mean, 2) + Math.pow(y - mean, 2)) /
+        (2 * Math.pow(sigma, 2))
+      );
+      const value = Math.exp(exponent);
+      kernel[y][x] = value;
+      sum += value;
+    }
+  }
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      kernel[y][x] /= sum;
+    }
+  }
+
+  return kernel;
 }
