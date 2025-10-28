@@ -70,7 +70,7 @@
           class="menu-item"
           data-active="false"
           onclick="setAtive(event)"
-          >Função 7</a
+          >Filtragem Espacial (Passa-Alta)</a
         >
         <a
           data-target="sec8"
@@ -78,15 +78,7 @@
           class="menu-item"
           data-active="false"
           onclick="setAtive(event)"
-          >Função 8</a
-        >
-        <a
-          data-target="sec9"
-          href="#"
-          class="menu-item"
-          data-active="false"
-          onclick="setAtive(event)"
-          >Função 9</a
+          >Operações Morfológicas</a
         >
         <a
           data-target="sec10"
@@ -435,20 +427,34 @@
           </div>
         </section>
 
-        <section
-          id="sec7"
-          class="content-section"
-          data-active="false"
-        ></section>
+        <section id="sec7" class="content-section" data-active="false">
+          <div class="controls">
+            <fieldset class="control-fieldset">
+              <legend>Primeira Ordem</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="prewitt()">
+                    Prewitt
+                  </button>
+                  <button class="btn-operation" onclick="sobel()">Sobel</button>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="control-fieldset">
+              <legend>Segunda Ordem</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="laplaciano()">
+                    Laplaciano
+                  </button>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </section>
 
         <section
           id="sec8"
-          class="content-section"
-          data-active="false"
-        ></section>
-
-        <section
-          id="sec9"
           class="content-section"
           data-active="false"
         ></section>

@@ -1522,3 +1522,279 @@ function generateGaussianKernel(size) {
 
   return kernel;
 }
+
+function prewitt() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const kernelX = [
+    [-1, 0, 1],
+    [-1, 0, 1],
+    [-1, 0, 1],
+  ];
+
+  const kernelY = [
+    [-1, -1, -1],
+    [0, 0, 0],
+    [1, 1, 1],
+  ];
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      let gxR = 0,
+        gxG = 0,
+        gxB = 0;
+      let gyR = 0,
+        gyG = 0,
+        gyB = 0;
+
+      for (let ky = -1; ky <= 1; ky++) {
+        for (let kx = -1; kx <= 1; kx++) {
+          const px = x + kx;
+          const py = y + ky;
+          const i = (py * width + px) * 4;
+
+          const r = image1Data.data[i];
+          const g = image1Data.data[i + 1];
+          const b = image1Data.data[i + 2];
+
+          const weightX = kernelX[ky + 1][kx + 1];
+          const weightY = kernelY[ky + 1][kx + 1];
+
+          gxR += r * weightX;
+          gxG += g * weightX;
+          gxB += b * weightX;
+
+          gyR += r * weightY;
+          gyG += g * weightY;
+          gyB += b * weightY;
+        }
+      }
+
+      const magnitudeR = Math.sqrt(gxR * gxR + gyR * gyR);
+      const magnitudeG = Math.sqrt(gxG * gxG + gyG * gyG);
+      const magnitudeB = Math.sqrt(gxB * gxB + gyB * gyB);
+
+      const i = (y * width + x) * 4;
+      resultData[i] = Math.min(255, Math.max(0, magnitudeR));
+      resultData[i + 1] = Math.min(255, Math.max(0, magnitudeG));
+      resultData[i + 2] = Math.min(255, Math.max(0, magnitudeB));
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Prewitt - Detecção de Bordas", "result-display");
+  showStatus("Filtro Prewitt aplicado com sucesso!", "sucess");
+}
+
+function sobel() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const kernelX = [
+    [-1, 0, 1],
+    [-2, 0, 2],
+    [-1, 0, 1],
+  ];
+
+  const kernelY = [
+    [-1, -2, -1],
+    [0, 0, 0],
+    [1, 2, 1],
+  ];
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      let gxR = 0,
+        gxG = 0,
+        gxB = 0;
+      let gyR = 0,
+        gyG = 0,
+        gyB = 0;
+
+      for (let ky = -1; ky <= 1; ky++) {
+        for (let kx = -1; kx <= 1; kx++) {
+          const px = x + kx;
+          const py = y + ky;
+          const i = (py * width + px) * 4;
+
+          const r = image1Data.data[i];
+          const g = image1Data.data[i + 1];
+          const b = image1Data.data[i + 2];
+
+          const weightX = kernelX[ky + 1][kx + 1];
+          const weightY = kernelY[ky + 1][kx + 1];
+
+          gxR += r * weightX;
+          gxG += g * weightX;
+          gxB += b * weightX;
+
+          gyR += r * weightY;
+          gyG += g * weightY;
+          gyB += b * weightY;
+        }
+      }
+
+      const magnitudeR = Math.sqrt(gxR * gxR + gyR * gyR);
+      const magnitudeG = Math.sqrt(gxG * gxG + gyG * gyG);
+      const magnitudeB = Math.sqrt(gxB * gxB + gyB * gyB);
+
+      const i = (y * width + x) * 4;
+      resultData[i] = Math.min(255, Math.max(0, magnitudeR));
+      resultData[i + 1] = Math.min(255, Math.max(0, magnitudeG));
+      resultData[i + 2] = Math.min(255, Math.max(0, magnitudeB));
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Sobel - Detecção de Bordas", "result-display");
+  showStatus("Filtro Sobel aplicado com sucesso!", "sucess");
+}
+
+function laplaciano() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const kernel = [
+    [-1, -1, -1],
+    [-1, 8, -1],
+    [-1, -1, -1],
+  ];
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      let sumR = 0,
+        sumG = 0,
+        sumB = 0;
+
+      for (let ky = -1; ky <= 1; ky++) {
+        for (let kx = -1; kx <= 1; kx++) {
+          const px = x + kx;
+          const py = y + ky;
+          const i = (py * width + px) * 4;
+
+          const r = image1Data.data[i];
+          const g = image1Data.data[i + 1];
+          const b = image1Data.data[i + 2];
+
+          const weight = kernel[ky + 1][kx + 1];
+
+          sumR += r * weight;
+          sumG += g * weight;
+          sumB += b * weight;
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = Math.min(255, Math.max(0, Math.abs(sumR)));
+      resultData[i + 1] = Math.min(255, Math.max(0, Math.abs(sumG)));
+      resultData[i + 2] = Math.min(255, Math.max(0, Math.abs(sumB)));
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Laplaciano - Detecção de Bordas", "result-display");
+  showStatus("Filtro Laplaciano aplicado com sucesso!", "sucess");
+}
+
+function laplacianoSimples() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const kernel = [
+    [0, -1, 0],
+    [-1, 4, -1],
+    [0, -1, 0],
+  ];
+
+  for (let y = 1; y < height - 1; y++) {
+    for (let x = 1; x < width - 1; x++) {
+      let sumR = 0,
+        sumG = 0,
+        sumB = 0;
+
+      for (let ky = -1; ky <= 1; ky++) {
+        for (let kx = -1; kx <= 1; kx++) {
+          const px = x + kx;
+          const py = y + ky;
+          const i = (py * width + px) * 4;
+
+          const r = image1Data.data[i];
+          const g = image1Data.data[i + 1];
+          const b = image1Data.data[i + 2];
+
+          const weight = kernel[ky + 1][kx + 1];
+
+          sumR += r * weight;
+          sumG += g * weight;
+          sumB += b * weight;
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = Math.min(255, Math.max(0, Math.abs(sumR)));
+      resultData[i + 1] = Math.min(255, Math.max(0, Math.abs(sumG)));
+      resultData[i + 2] = Math.min(255, Math.max(0, Math.abs(sumB)));
+      resultData[i + 3] = image1Data.data[i + 3];
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Laplaciano Simples", "result-display");
+  showStatus("Filtro Laplaciano Simples aplicado!", "sucess");
+}
