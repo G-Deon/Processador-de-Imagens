@@ -101,7 +101,7 @@ function loadTiffImage(file, imageNumber) {
       const tiff = new Tiff({ buffer: e.target.result });
 
       console.log("TIFF carregado, convertendo para canvas...");
-      
+
       const canvas = tiff.toCanvas();
 
       if (!canvas) {
@@ -1829,4 +1829,446 @@ function laplacianoSimples() {
   ctx.putImageData(resultImageData, 0, 0);
   displayImage(canvas, "Laplaciano Simples", "result-display");
   showStatus("Filtro Laplaciano Simples aplicado!", "sucess");
+}
+
+function createStructuringElement(size, type) {
+  const element = [];
+  const center = Math.floor(size / 2);
+
+  for (let y = 0; y < size; y++) {
+    element[y] = [];
+    for (let x = 0; x < size; x++) {
+      element[y][x] = 0;
+    }
+  }
+
+  if (type === "horizontal") {
+    for (let x = 0; x < size; x++) {
+      element[center][x] = 1;
+    }
+  } else if (type === "vertical") {
+    for (let y = 0; y < size; y++) {
+      element[y][center] = 1;
+    }
+  } else if (type === "cross") {
+    for (let x = 0; x < size; x++) {
+      element[center][x] = 1;
+    }
+    for (let y = 0; y < size; y++) {
+      element[y][center] = 1;
+    }
+  }
+
+  return element;
+}
+
+function ensureBinaryImage(imageData) {
+  const data = imageData.data;
+  const binaryData = new Uint8ClampedArray(data.length);
+
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const binary = gray > 127 ? 255 : 0;
+
+    binaryData[i] = binary;
+    binaryData[i + 1] = binary;
+    binaryData[i + 2] = binary;
+    binaryData[i + 3] = data[i + 3];
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = imageData.width;
+  canvas.height = imageData.height;
+  const ctx = canvas.getContext("2d");
+  const newImageData = ctx.createImageData(imageData.width, imageData.height);
+  newImageData.data.set(binaryData);
+
+  return newImageData;
+}
+
+function dilate() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const kernelSize = parseInt(document.getElementById("morphKernelSize").value);
+  const structType = document.getElementById("morphStructElement").value;
+  const structElement = createStructuringElement(kernelSize, structType);
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const binaryImage = ensureBinaryImage(image1Data);
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let maxValue = 0;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (structElement[ky + halfKernel][kx + halfKernel] === 1) {
+            const nx = x + kx;
+            const ny = y + ky;
+
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const i = (ny * width + nx) * 4;
+              maxValue = Math.max(maxValue, binaryImage.data[i]);
+            }
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = maxValue;
+      resultData[i + 1] = maxValue;
+      resultData[i + 2] = maxValue;
+      resultData[i + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(
+    canvas,
+    `Dilatação ${kernelSize}x${kernelSize}`,
+    "result-display"
+  );
+  showStatus(`Dilatação ${kernelSize}x${kernelSize} aplicada!`, "sucess");
+}
+
+function erode() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const kernelSize = parseInt(document.getElementById("morphKernelSize").value);
+  const structType = document.getElementById("morphStructElement").value;
+  const structElement = createStructuringElement(kernelSize, structType);
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  const binaryImage = ensureBinaryImage(image1Data);
+  const resultImageData = ctx.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let minValue = 255;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (structElement[ky + halfKernel][kx + halfKernel] === 1) {
+            const nx = x + kx;
+            const ny = y + ky;
+
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const i = (ny * width + nx) * 4;
+              minValue = Math.min(minValue, binaryImage.data[i]);
+            } else {
+              minValue = 0;
+            }
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = minValue;
+      resultData[i + 1] = minValue;
+      resultData[i + 2] = minValue;
+      resultData[i + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, `Erosão ${kernelSize}x${kernelSize}`, "result-display");
+  showStatus(`Erosão ${kernelSize}x${kernelSize} aplicada!`, "sucess");
+}
+
+function opening() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const kernelSize = parseInt(document.getElementById("morphKernelSize").value);
+  const structType = document.getElementById("morphStructElement").value;
+  const structElement = createStructuringElement(kernelSize, structType);
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas1 = document.createElement("canvas");
+  canvas1.width = width;
+  canvas1.height = height;
+  const ctx1 = canvas1.getContext("2d");
+
+  const binaryImage = ensureBinaryImage(image1Data);
+  const erodedImageData = ctx1.createImageData(width, height);
+  const erodedData = erodedImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let minValue = 255;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (structElement[ky + halfKernel][kx + halfKernel] === 1) {
+            const nx = x + kx;
+            const ny = y + ky;
+
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const i = (ny * width + nx) * 4;
+              minValue = Math.min(minValue, binaryImage.data[i]);
+            } else {
+              minValue = 0;
+            }
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      erodedData[i] = minValue;
+      erodedData[i + 1] = minValue;
+      erodedData[i + 2] = minValue;
+      erodedData[i + 3] = 255;
+    }
+  }
+
+  const canvas2 = document.createElement("canvas");
+  canvas2.width = width;
+  canvas2.height = height;
+  const ctx2 = canvas2.getContext("2d");
+
+  const resultImageData = ctx2.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let maxValue = 0;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (structElement[ky + halfKernel][kx + halfKernel] === 1) {
+            const nx = x + kx;
+            const ny = y + ky;
+
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const i = (ny * width + nx) * 4;
+              maxValue = Math.max(maxValue, erodedData[i]);
+            }
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = maxValue;
+      resultData[i + 1] = maxValue;
+      resultData[i + 2] = maxValue;
+      resultData[i + 3] = 255;
+    }
+  }
+
+  ctx2.putImageData(resultImageData, 0, 0);
+  displayImage(
+    canvas2,
+    `Abertura ${kernelSize}x${kernelSize}`,
+    "result-display"
+  );
+  showStatus(`Abertura ${kernelSize}x${kernelSize} aplicada!`, "sucess");
+}
+
+function closing() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const kernelSize = parseInt(document.getElementById("morphKernelSize").value);
+  const structType = document.getElementById("morphStructElement").value;
+  const structElement = createStructuringElement(kernelSize, structType);
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  const canvas1 = document.createElement("canvas");
+  canvas1.width = width;
+  canvas1.height = height;
+  const ctx1 = canvas1.getContext("2d");
+
+  const binaryImage = ensureBinaryImage(image1Data);
+  const dilatedImageData = ctx1.createImageData(width, height);
+  const dilatedData = dilatedImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let maxValue = 0;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (structElement[ky + halfKernel][kx + halfKernel] === 1) {
+            const nx = x + kx;
+            const ny = y + ky;
+
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const i = (ny * width + nx) * 4;
+              maxValue = Math.max(maxValue, binaryImage.data[i]);
+            }
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      dilatedData[i] = maxValue;
+      dilatedData[i + 1] = maxValue;
+      dilatedData[i + 2] = maxValue;
+      dilatedData[i + 3] = 255;
+    }
+  }
+
+  const canvas2 = document.createElement("canvas");
+  canvas2.width = width;
+  canvas2.height = height;
+  const ctx2 = canvas2.getContext("2d");
+
+  const resultImageData = ctx2.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let minValue = 255;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (structElement[ky + halfKernel][kx + halfKernel] === 1) {
+            const nx = x + kx;
+            const ny = y + ky;
+
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const i = (ny * width + nx) * 4;
+              minValue = Math.min(minValue, dilatedData[i]);
+            } else {
+              minValue = 0;
+            }
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      resultData[i] = minValue;
+      resultData[i + 1] = minValue;
+      resultData[i + 2] = minValue;
+      resultData[i + 3] = 255;
+    }
+  }
+
+  ctx2.putImageData(resultImageData, 0, 0);
+  displayImage(
+    canvas2,
+    `Fechamento ${kernelSize}x${kernelSize}`,
+    "result-display"
+  );
+  showStatus(`Fechamento ${kernelSize}x${kernelSize} aplicado!`, "sucess");
+}
+
+function outline() {
+  if (!image1Data) {
+    showStatus("Por favor, carregue a primeira imagem!", "error");
+    return;
+  }
+
+  const kernelSize = parseInt(document.getElementById("morphKernelSize").value);
+  const structType = document.getElementById("morphStructElement").value;
+  const structElement = createStructuringElement(kernelSize, structType);
+
+  const width = image1Data.width;
+  const height = image1Data.height;
+
+  // Passo 1: Obter imagem binária original
+  const binaryImage = ensureBinaryImage(image1Data);
+
+  // Passo 2: Aplicar erosão
+  const canvas1 = document.createElement("canvas");
+  canvas1.width = width;
+  canvas1.height = height;
+  const ctx1 = canvas1.getContext("2d");
+
+  const erodedImageData = ctx1.createImageData(width, height);
+  const erodedData = erodedImageData.data;
+
+  const halfKernel = Math.floor(kernelSize / 2);
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let minValue = 255;
+
+      for (let ky = -halfKernel; ky <= halfKernel; ky++) {
+        for (let kx = -halfKernel; kx <= halfKernel; kx++) {
+          if (structElement[ky + halfKernel][kx + halfKernel] === 1) {
+            const nx = x + kx;
+            const ny = y + ky;
+
+            if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+              const i = (ny * width + nx) * 4;
+              minValue = Math.min(minValue, binaryImage.data[i]);
+            } else {
+              minValue = 0;
+            }
+          }
+        }
+      }
+
+      const i = (y * width + x) * 4;
+      erodedData[i] = minValue;
+      erodedData[i + 1] = minValue;
+      erodedData[i + 2] = minValue;
+      erodedData[i + 3] = 255;
+    }
+  }
+
+  // Passo 3: Subtrair erosão da imagem original
+  const canvas2 = document.createElement("canvas");
+  canvas2.width = width;
+  canvas2.height = height;
+  const ctx2 = canvas2.getContext("2d");
+
+  const resultImageData = ctx2.createImageData(width, height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < binaryImage.data.length; i += 4) {
+    const diff = Math.max(0, binaryImage.data[i] - erodedData[i]);
+    resultData[i] = diff;
+    resultData[i + 1] = diff;
+    resultData[i + 2] = diff;
+    resultData[i + 3] = 255;
+  }
+
+  ctx2.putImageData(resultImageData, 0, 0);
+  displayImage(
+    canvas2,
+    `Contorno ${kernelSize}x${kernelSize}`,
+    "result-display"
+  );
+  showStatus(`Contorno ${kernelSize}x${kernelSize} aplicado!`, "sucess");
 }

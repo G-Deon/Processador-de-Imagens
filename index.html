@@ -118,7 +118,6 @@
 
         <section id="sec1" class="content-section" data-active="false">
           <div class="controls">
-            <!-- Grupo: Operações com Valor -->
             <fieldset class="control-fieldset">
               <legend>Operações com Valor</legend>
               <div class="fieldset-content">
@@ -153,7 +152,6 @@
               </div>
             </fieldset>
 
-            <!-- Grupo: Multiplicação e Divisão -->
             <fieldset class="control-fieldset">
               <legend>Multiplicação e Divisão</legend>
               <div class="fieldset-content">
@@ -181,7 +179,6 @@
               </div>
             </fieldset>
 
-            <!-- Grupo: Operações entre Imagens -->
             <fieldset class="control-fieldset">
               <legend>Operações entre Imagens</legend>
               <div class="fieldset-content">
@@ -459,11 +456,70 @@
           </div>
         </section>
 
-        <section
-          id="sec8"
-          class="content-section"
-          data-active="false"
-        ></section>
+        <section id="sec8" class="content-section" data-active="false">
+          <div class="controls">
+            <fieldset class="control-fieldset">
+              <legend>Elemento Estruturante</legend>
+              <div class="fieldset-content">
+                <div class="control-group">
+                  <label for="morphKernelSize">Tamanho da Grade:</label>
+                  <select id="morphKernelSize">
+                    <option value="3">3x3</option>
+                    <option value="5">5x5</option>
+                    <option value="7">7x7</option>
+                  </select>
+                </div>
+                <div class="control-group">
+                  <label for="morphStructElement">Tipo de Elemento:</label>
+                  <select id="morphStructElement">
+                    <option value="horizontal">Linha Horizontal</option>
+                    <option value="vertical">Linha Vertical</option>
+                    <option value="cross">Cruz</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="control-fieldset">
+              <legend>Operações Morfológicas Básicas</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="dilate()">
+                    Dilatação
+                  </button>
+                  <button class="btn-operation" onclick="erode()">
+                    Erosão
+                  </button>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="control-fieldset">
+              <legend>Operações Morfológicas Compostas</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="opening()">
+                    Abertura
+                  </button>
+                  <button class="btn-operation" onclick="closing()">
+                    Fechamento
+                  </button>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset class="control-fieldset">
+              <legend>Operações Morfológicas Avançadas</legend>
+              <div class="fieldset-content">
+                <div class="control-group-inline">
+                  <button class="btn-operation" onclick="outline()">
+                    Contorno
+                  </button>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </section>
 
         <section id="sec9" class="content-section" data-active="false">
           <div class="color-info" id="colorInfo">
