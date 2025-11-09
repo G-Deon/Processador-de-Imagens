@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Processador de Imagens</title>
     <link rel="stylesheet" href="/style.css" />
-    <!-- Biblioteca TIFF.js para leitura de arquivos TIFF -->
     <script src="https://cdn.jsdelivr.net/npm/tiff.js@latest/tiff.min.js"></script>
     <script src="/script.js" defer></script>
   </head>
@@ -81,7 +80,7 @@
           >Operações Morfológicas</a
         >
         <a
-          data-target="sec10"
+          data-target="sec9"
           href="#"
           class="menu-item"
           data-active="false"
@@ -126,11 +125,18 @@
                 <div class="control-group">
                   <label for="valueInput">Valor:</label>
                   <input
-                    type="number"
+                    type="range"
                     id="valueInput"
-                    value="0"
-                    min="-255"
+                    min="0"
                     max="255"
+                    value="128"
+                  />
+                  <input
+                    type="number"
+                    id="inputValue"
+                    min="0"
+                    max="255"
+                    value="128"
                   />
                 </div>
                 <div class="control-group-inline">
@@ -459,7 +465,7 @@
           data-active="false"
         ></section>
 
-        <section id="sec10" class="content-section" data-active="false">
+        <section id="sec9" class="content-section" data-active="false">
           <div class="color-info" id="colorInfo">
             <h3>Informações de Cor do Pixel Clicado</h3>
             <div class="color-values">

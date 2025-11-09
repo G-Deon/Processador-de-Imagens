@@ -20,6 +20,19 @@ document.getElementById("image2").addEventListener("change", function (e) {
   loadImage(e.target.files[0], 2);
 });
 
+const slider = document.getElementById("valueInput");
+const input = document.getElementById("inputValue");
+
+slider.addEventListener("inputValue", function () {
+  input.value = slider.value;
+});
+
+input.addEventListener("inputValue", function () {
+  if (input.value >= 0 && input.value <= 255) {
+    slider.value = input.value;
+  }
+});
+
 function setAtive(ev) {
   const targetId = ev.currentTarget.dataset.target;
   const targetSection = document.getElementById(targetId);
@@ -73,7 +86,6 @@ function loadTiffImage(file, imageNumber) {
   const reader = new FileReader();
   reader.onload = function (e) {
     try {
-      // Verifica se a biblioteca Tiff está disponível
       if (typeof Tiff === "undefined") {
         showStatus(
           "Biblioteca TIFF não carregada! Verifique a conexão com a internet.",
@@ -82,18 +94,14 @@ function loadTiffImage(file, imageNumber) {
         console.error("Tiff.js não está disponível");
         return;
       }
-
       console.log("Carregando arquivo TIFF...");
 
-      // Inicializa a biblioteca TIFF com mais memória
       Tiff.initialize({ TOTAL_MEMORY: 16777216 * 10 });
 
-      // Cria o objeto TIFF a partir do buffer
       const tiff = new Tiff({ buffer: e.target.result });
 
       console.log("TIFF carregado, convertendo para canvas...");
-
-      // Converte para canvas
+      
       const canvas = tiff.toCanvas();
 
       if (!canvas) {
@@ -190,21 +198,45 @@ function displayImage(canvas, title, id) {
 }
 
 function showPixelColor(canvas, x, y) {
-  const ctx = canvas.getContext("2d");
-  const imageData = ctx.getImageData(x, y, 1, 1);
-  const data = imageData.data;
+  const section = document.getElementById("sec9");
+  if (section.dataset.active === "true") {
+    const ctx = canvas.getContext("2d");
+    const imageData = ctx.getImageData(x, y, 1, 1);
+    const data = imageData.data;
 
-  const r = data[0];
-  const g = data[1];
-  const b = data[2];
+    const r = data[0];
+    const g = data[1];
+    const b = data[2];
 
-  const rgb = "RGB(" + r + ", " + g + ", " + b + ")";
-  const cmyk = rgbToCmyk(r, g, b);
-  const hsl = rgbToHsl(r, g, b);
+    const rgb = "RGB(" + r + ", " + g + ", " + b + ")";
+    const cmyk = rgbToCmyk(r, g, b);
+    const hsl = rgbToHsl(r, g, b);
 
-  document.getElementById("rgbValue").textContent = rgb;
-  document.getElementById("cmykValue").textContent = cmyk;
-  document.getElementById("hslValue").textContent = hsl;
+    const resultCanvas = document.createElement("canvas");
+    const width = canvas.width;
+    const height = canvas.height;
+    resultCanvas.width = width;
+    resultCanvas.height = height;
+
+    const resultCtx = resultCanvas.getContext("2d");
+    const resultImageData = resultCtx.createImageData(width, height);
+    const resultData = resultImageData.data;
+
+    for (let i = 0; i < resultData.length; i += 4) {
+      resultData[i] = r;
+      resultData[i + 1] = g;
+      resultData[i + 2] = b;
+      resultData[i + 3] = 255;
+    }
+
+    resultCtx.putImageData(resultImageData, 0, 0);
+    let title = "Cor do Pixel Clicado";
+    displayImage(resultCanvas, title, "result-display");
+
+    document.getElementById("rgbValue").textContent = rgb;
+    document.getElementById("cmykValue").textContent = cmyk;
+    document.getElementById("hslValue").textContent = hsl;
+  }
 }
 
 function rgbToCmyk(r, g, b) {

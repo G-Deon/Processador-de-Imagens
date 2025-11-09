@@ -96,7 +96,7 @@ body {
 
 /* ===== SIDEBAR (MENU LATERAL) ===== */
 .sidebar {
-  width: 280px;
+  width: 320px;
   background-color: var(--bg-sidebar);
   backdrop-filter: blur(20px);
   border-right: 1px solid rgba(255, 255, 255, 0.2);
