@@ -20,17 +20,79 @@ document.getElementById("image2").addEventListener("change", function (e) {
   loadImage(e.target.files[0], 2);
 });
 
-const slider = document.getElementById("valueInput");
-const input = document.getElementById("inputValue");
+// Sincronizar o input range com o input number
+const blendingRange = document.getElementById("blendingRange");
+const blendingValue = document.getElementById("blendingValue");
 
-slider.addEventListener("inputValue", function () {
-  input.value = slider.value;
+// Quando o range mudar, atualizar o number
+blendingRange.addEventListener("input", function () {
+  blendingValue.value = this.value;
 });
 
-input.addEventListener("inputValue", function () {
-  if (input.value >= 0 && input.value <= 255) {
-    slider.value = input.value;
-  }
+// Quando o number mudar, atualizar o range
+blendingValue.addEventListener("input", function () {
+  blendingRange.value = this.value;
+});
+
+const valueInput = document.getElementById("valueInput");
+const inputValue = document.getElementById("inputValue");
+
+// Quando o range mudar, atualizar o number
+valueInput.addEventListener("input", function () {
+  inputValue.value = this.value;
+});
+
+// Quando o number mudar, atualizar o range
+inputValue.addEventListener("input", function () {
+  valueInput.value = this.value;
+});
+
+const binaryRange = document.getElementById("binaryRange");
+const binaryValue = document.getElementById("binaryValue");
+
+// Quando o range mudar, atualizar o number
+binaryRange.addEventListener("input", function () {
+  binaryValue.value = this.value;
+});
+
+// Quando o number mudar, atualizar o range
+binaryValue.addEventListener("input", function () {
+  binaryRange.value = this.value;
+});
+
+const ordemRange = document.getElementById("ordemRange");
+const ordemValue = document.getElementById("ordemValue");
+
+// Quando o range mudar, atualizar o number
+ordemRange.addEventListener("input", function () {
+  ordemValue.value = this.value;
+});
+
+// Quando o number mudar, atualizar o range
+ordemValue.addEventListener("input", function () {
+  ordemRange.value = this.value;
+});
+
+passaBaixaKernel.addEventListener("change", function () {
+  const size = parseInt(this.value);
+  const max = size * size;
+  ordemRange.max = max;
+  ordemValue.max = max;
+  ordemRange.value = parseInt(max / 2);
+  ordemValue.value = parseInt(max / 2);
+});
+
+const glaussRange = document.getElementById("glaussRange");
+const glaussValue = document.getElementById("glaussValue");
+
+// Quando o range mudar, atualizar o number
+glaussRange.addEventListener("input", function () {
+  glaussValue.value = this.value;
+});
+
+// Quando o number mudar, atualizar o range
+glaussValue.addEventListener("input", function () {
+  glaussRange.value = this.value;
 });
 
 function setAtive(ev) {
@@ -1046,19 +1108,7 @@ function equalizeHistogram() {
   showStatus("Equalização de histograma concluída com sucesso!", "sucess");
 }
 
-function max3x3() {
-  applyMaxFilter(3);
-}
-
-function max5x5() {
-  applyMaxFilter(5);
-}
-
-function max7x7() {
-  applyMaxFilter(7);
-}
-
-function applyMaxFilter(kernelSize) {
+function applyMaxFilter() {
   const width = image1Data.width;
   const height = image1Data.height;
 
@@ -1069,7 +1119,9 @@ function applyMaxFilter(kernelSize) {
 
   const resultImageData = ctx.createImageData(width, height);
   const resultData = resultImageData.data;
-
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
   const halfKernel = Math.floor(kernelSize / 2);
 
   for (let y = 0; y < height; y++) {
@@ -1104,19 +1156,7 @@ function applyMaxFilter(kernelSize) {
   displayImage(canvas, `Máximo ${kernelSize}x${kernelSize}`, "result-display");
 }
 
-function min3x3() {
-  applyMinFilter(3);
-}
-
-function min5x5() {
-  applyMinFilter(5);
-}
-
-function min7x7() {
-  applyMinFilter(7);
-}
-
-function applyMinFilter(kernelSize) {
+function applyMinFilter() {
   const width = image1Data.width;
   const height = image1Data.height;
 
@@ -1127,7 +1167,9 @@ function applyMinFilter(kernelSize) {
 
   const resultImageData = ctx.createImageData(width, height);
   const resultData = resultImageData.data;
-
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
   const halfKernel = Math.floor(kernelSize / 2);
 
   for (let y = 0; y < height; y++) {
@@ -1162,19 +1204,7 @@ function applyMinFilter(kernelSize) {
   displayImage(canvas, `Mínimo ${kernelSize}x${kernelSize}`, "result-display");
 }
 
-function mean3x3() {
-  applyMeanFilter(3);
-}
-
-function mean5x5() {
-  applyMeanFilter(5);
-}
-
-function mean7x7() {
-  applyMeanFilter(7);
-}
-
-function applyMeanFilter(kernelSize) {
+function applyMeanFilter() {
   const width = image1Data.width;
   const height = image1Data.height;
 
@@ -1185,7 +1215,9 @@ function applyMeanFilter(kernelSize) {
 
   const resultImageData = ctx.createImageData(width, height);
   const resultData = resultImageData.data;
-
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
   const halfKernel = Math.floor(kernelSize / 2);
 
   for (let y = 0; y < height; y++) {
@@ -1222,19 +1254,7 @@ function applyMeanFilter(kernelSize) {
   displayImage(canvas, `Média ${kernelSize}x${kernelSize}`, "result-display");
 }
 
-function median3x3() {
-  applyMedianFilter(3);
-}
-
-function median5x5() {
-  applyMedianFilter(5);
-}
-
-function median7x7() {
-  applyMedianFilter(7);
-}
-
-function applyMedianFilter(kernelSize) {
+function applyMedianFilter() {
   const width = image1Data.width;
   const height = image1Data.height;
 
@@ -1246,6 +1266,9 @@ function applyMedianFilter(kernelSize) {
   const resultImageData = ctx.createImageData(width, height);
   const resultData = resultImageData.data;
 
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
   const halfKernel = Math.floor(kernelSize / 2);
 
   for (let y = 0; y < height; y++) {
@@ -1286,19 +1309,7 @@ function applyMedianFilter(kernelSize) {
   displayImage(canvas, `Mediana ${kernelSize}x${kernelSize}`, "result-display");
 }
 
-function suacon3x3() {
-  applySuaConFilter(3);
-}
-
-function suacon5x5() {
-  applySuaConFilter(5);
-}
-
-function suacon7x7() {
-  applySuaConFilter(7);
-}
-
-function applySuaConFilter(kernelSize) {
+function applySuaConFilter() {
   const width = image1Data.width;
   const height = image1Data.height;
 
@@ -1309,7 +1320,9 @@ function applySuaConFilter(kernelSize) {
 
   const resultImageData = ctx.createImageData(width, height);
   const resultData = resultImageData.data;
-
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
   const halfKernel = Math.floor(kernelSize / 2);
 
   for (let y = 0; y < height; y++) {
@@ -1376,19 +1389,7 @@ function applySuaConFilter(kernelSize) {
   displayImage(canvas, `Mediana ${kernelSize}x${kernelSize}`, "result-display");
 }
 
-function ordem3x3() {
-  applyOrdemFilter(3);
-}
-
-function ordem5x5() {
-  applyOrdemFilter(5);
-}
-
-function ordem7x7() {
-  applyOrdemFilter(7);
-}
-
-function applyOrdemFilter(kernelSize) {
+function applyOrdemFilter() {
   if (!image1Data) {
     showStatus("Por favor, carregue a primeira imagem!", "error");
     return;
@@ -1404,11 +1405,12 @@ function applyOrdemFilter(kernelSize) {
 
   const resultImageData = ctx.createImageData(width, height);
   const resultData = resultImageData.data;
-
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
   const halfKernel = Math.floor(kernelSize / 2);
 
-  const totalElements = kernelSize * kernelSize;
-  const rank = Math.floor(totalElements / 2);
+  const rank = parseInt(document.getElementById("ordemValue").value);
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -1435,9 +1437,9 @@ function applyOrdemFilter(kernelSize) {
       valuesB.sort((a, b) => a - b);
 
       const i = (y * width + x) * 4;
-      resultData[i] = valuesR[rank];
-      resultData[i + 1] = valuesG[rank];
-      resultData[i + 2] = valuesB[rank];
+      resultData[i] = valuesR[rank - 1];
+      resultData[i + 1] = valuesG[rank - 1];
+      resultData[i + 2] = valuesB[rank - 1];
       resultData[i + 3] = image1Data.data[i + 3];
     }
   }
@@ -1451,19 +1453,7 @@ function applyOrdemFilter(kernelSize) {
   showStatus(`Filtro de Ordem ${kernelSize}x${kernelSize} aplicado!`, "sucess");
 }
 
-function gaussiano3x3() {
-  applyGaussianFilter(3);
-}
-
-function gaussiano5x5() {
-  applyGaussianFilter(5);
-}
-
-function gaussiano7x7() {
-  applyGaussianFilter(7);
-}
-
-function applyGaussianFilter(kernelSize) {
+function applyGaussianFilter() {
   if (!image1Data) {
     showStatus("Por favor, carregue a primeira imagem!", "error");
     return;
@@ -1479,7 +1469,9 @@ function applyGaussianFilter(kernelSize) {
 
   const resultImageData = ctx.createImageData(width, height);
   const resultData = resultImageData.data;
-
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
   const kernel = generateGaussianKernel(kernelSize);
   const halfKernel = Math.floor(kernelSize / 2);
 
@@ -1529,7 +1521,7 @@ function applyGaussianFilter(kernelSize) {
 
 function generateGaussianKernel(size) {
   const kernel = [];
-  const sigma = size / 6.0;
+  const sigma = parseFloat(document.getElementById("glaussValue").value);
   const mean = Math.floor(size / 2);
   let sum = 0;
 

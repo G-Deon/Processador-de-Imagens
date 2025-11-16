@@ -250,6 +250,14 @@
                 <div class="control-group">
                   <label for="blendingValue">Valor (0-1):</label>
                   <input
+                    type="range"
+                    id="blendingRange"
+                    min="0"
+                    max="1"
+                    value="0.5"
+                    step="0.1"
+                  />
+                  <input
                     type="number"
                     id="blendingValue"
                     value="0.5"
@@ -293,11 +301,18 @@
               <legend>Limiarização de imagens.</legend>
               <div class="fieldset-content">
                 <div class="control-group">
-                  <label for="binaryValue">Valor (0-1):</label>
+                  <label for="binaryValue">Valor (0-255):</label>
+                  <input
+                    type="range"
+                    id="binaryRange"
+                    min="0"
+                    max="255"
+                    value="128"
+                  />
                   <input
                     type="number"
                     id="binaryValue"
-                    value="0"
+                    value="128"
                     min="0"
                     max="255"
                     step="1"
@@ -334,12 +349,25 @@
         <section id="sec6" class="content-section" data-active="false">
           <div class="controls">
             <fieldset class="control-fieldset">
+              <legend>Definição do Kernel</legend>
+              <div class="fieldset-content">
+                <div class="control-group">
+                  <label for="passaBaixaKernel">Tamanho da Grade:</label>
+                  <select id="passaBaixaKernel">
+                    <option value="3">3x3</option>
+                    <option value="5">5x5</option>
+                    <option value="7">7x7</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="control-fieldset">
               <legend>Filtro MAX</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="max3x3()">3x3</button>
-                  <button class="btn-operation" onclick="max5x5()">5x5</button>
-                  <button class="btn-operation" onclick="max7x7()">7x7</button>
+                  <button class="btn-operation" onclick="applyMaxFilter()">
+                    MAX
+                  </button>
                 </div>
               </div>
             </fieldset>
@@ -347,9 +375,9 @@
               <legend>Filtro MIN</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="min3x3()">3x3</button>
-                  <button class="btn-operation" onclick="min5x5()">5x5</button>
-                  <button class="btn-operation" onclick="min7x7()">7x7</button>
+                  <button class="btn-operation" onclick="applyMinFilter()">
+                    MIN
+                  </button>
                 </div>
               </div>
             </fieldset>
@@ -357,9 +385,9 @@
               <legend>Filtro MEAN</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="mean3x3()">3x3</button>
-                  <button class="btn-operation" onclick="mean5x5()">5x5</button>
-                  <button class="btn-operation" onclick="mean7x7()">7x7</button>
+                  <button class="btn-operation" onclick="applyMeanFilter()">
+                    MEAN
+                  </button>
                 </div>
               </div>
             </fieldset>
@@ -367,14 +395,8 @@
               <legend>Filtro Mediana</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="median3x3()">
-                    3x3
-                  </button>
-                  <button class="btn-operation" onclick="median5x5()">
-                    5x5
-                  </button>
-                  <button class="btn-operation" onclick="median7x7()">
-                    7x7
+                  <button class="btn-operation" onclick="applyMedianFilter()">
+                    Mediana
                   </button>
                 </div>
               </div>
@@ -382,15 +404,26 @@
             <fieldset class="control-fieldset">
               <legend>Filtro de Ordem</legend>
               <div class="fieldset-content">
+                <div class="control-group">
+                  <label for="valueInput">Valor:</label>
+                  <input
+                    type="range"
+                    id="ordemRange"
+                    min="1"
+                    max="9"
+                    value="5"
+                  />
+                  <input
+                    type="number"
+                    id="ordemValue"
+                    min="1"
+                    max="9"
+                    value="5"
+                  />
+                </div>
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="ordem3x3()">
-                    3x3
-                  </button>
-                  <button class="btn-operation" onclick="ordem5x5()">
-                    5x5
-                  </button>
-                  <button class="btn-operation" onclick="ordem7x7()">
-                    7x7
+                  <button class="btn-operation" onclick="applyOrdemFilter()">
+                    Ordem
                   </button>
                 </div>
               </div>
@@ -399,14 +432,8 @@
               <legend>Suavisação Consertiva</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="suacon3x3()">
-                    3x3
-                  </button>
-                  <button class="btn-operation" onclick="suacon5x5()">
-                    5x5
-                  </button>
-                  <button class="btn-operation" onclick="suacon7x7()">
-                    7x7
+                  <button class="btn-operation" onclick="applySuaConFilter()">
+                    Suavisação Consertiva
                   </button>
                 </div>
               </div>
@@ -414,15 +441,28 @@
             <fieldset class="control-fieldset">
               <legend>Filtro Gaussiano</legend>
               <div class="fieldset-content">
+                <div class="control-group">
+                  <label for="valueInput">Valor:</label>
+                  <input
+                    type="range"
+                    id="glaussRange"
+                    min="0"
+                    max="3"
+                    value="1"
+                    step="0.1"
+                  />
+                  <input
+                    type="number"
+                    id="glaussValue"
+                    min="0"
+                    max="3"
+                    value="1"
+                    step="0.1"
+                  />
+                </div>
                 <div class="control-group-inline">
-                  <button class="btn-operation" onclick="gaussiano3x3()">
-                    3x3
-                  </button>
-                  <button class="btn-operation" onclick="gaussiano5x5()">
-                    5x5
-                  </button>
-                  <button class="btn-operation" onclick="gaussiano7x7()">
-                    7x7
+                  <button class="btn-operation" onclick="applyGaussianFilter()">
+                    Gaussiano
                   </button>
                 </div>
               </div>
