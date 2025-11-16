@@ -349,10 +349,9 @@
         <section id="sec6" class="content-section" data-active="false">
           <div class="controls">
             <fieldset class="control-fieldset">
-              <legend>Definição do Kernel</legend>
+              <legend>Tamanho da Grade</legend>
               <div class="fieldset-content">
                 <div class="control-group">
-                  <label for="passaBaixaKernel">Tamanho da Grade:</label>
                   <select id="passaBaixaKernel">
                     <option value="3">3x3</option>
                     <option value="5">5x5</option>
@@ -362,41 +361,30 @@
               </div>
             </fieldset>
             <fieldset class="control-fieldset">
-              <legend>Filtro MAX</legend>
+              <legend>Filtro Simples</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
                   <button class="btn-operation" onclick="applyMaxFilter()">
-                    MAX
+                    Max
                   </button>
-                </div>
-              </div>
-            </fieldset>
-            <fieldset class="control-fieldset">
-              <legend>Filtro MIN</legend>
-              <div class="fieldset-content">
-                <div class="control-group-inline">
                   <button class="btn-operation" onclick="applyMinFilter()">
-                    MIN
+                    Min
                   </button>
-                </div>
-              </div>
-            </fieldset>
-            <fieldset class="control-fieldset">
-              <legend>Filtro MEAN</legend>
-              <div class="fieldset-content">
-                <div class="control-group-inline">
                   <button class="btn-operation" onclick="applyMeanFilter()">
-                    MEAN
+                    Mean
                   </button>
                 </div>
               </div>
             </fieldset>
             <fieldset class="control-fieldset">
-              <legend>Filtro Mediana</legend>
+              <legend>Filtros de Suavização</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
                   <button class="btn-operation" onclick="applyMedianFilter()">
                     Mediana
+                  </button>
+                  <button class="btn-operation" onclick="applySuaConFilter()">
+                    Suavisação C.
                   </button>
                 </div>
               </div>
@@ -429,20 +417,10 @@
               </div>
             </fieldset>
             <fieldset class="control-fieldset">
-              <legend>Suavisação Consertiva</legend>
-              <div class="fieldset-content">
-                <div class="control-group-inline">
-                  <button class="btn-operation" onclick="applySuaConFilter()">
-                    Suavisação Consertiva
-                  </button>
-                </div>
-              </div>
-            </fieldset>
-            <fieldset class="control-fieldset">
               <legend>Filtro Gaussiano</legend>
               <div class="fieldset-content">
                 <div class="control-group">
-                  <label for="valueInput">Valor:</label>
+                  <label for="valueInput">Valor (σ):</label>
                   <input
                     type="range"
                     id="glaussRange"
@@ -464,6 +442,18 @@
                   <button class="btn-operation" onclick="applyGaussianFilter()">
                     Gaussiano
                   </button>
+                </div>
+                <div class="control-group-inline">
+                  <canvas
+                    id="gaussianKernelCanvas"
+                    width="200"
+                    height="200"
+                    style="
+                      border: 1px solid #ccc;
+                      border-radius: 4px;
+                      margin: 10px 0;
+                    "
+                  ></canvas>
                 </div>
               </div>
             </fieldset>
@@ -499,10 +489,10 @@
         <section id="sec8" class="content-section" data-active="false">
           <div class="controls">
             <fieldset class="control-fieldset">
-              <legend>Elemento Estruturante</legend>
+              <legend>Definição de valores</legend>
               <div class="fieldset-content">
                 <div class="control-group">
-                  <label for="morphKernelSize">Tamanho da Grade:</label>
+                  <label for="morphKernelSize">Grade:</label>
                   <select id="morphKernelSize">
                     <option value="3">3x3</option>
                     <option value="5">5x5</option>
@@ -510,7 +500,7 @@
                   </select>
                 </div>
                 <div class="control-group">
-                  <label for="morphStructElement">Tipo de Elemento:</label>
+                  <label for="morphStructElement">Elemento Estruturante:</label>
                   <select id="morphStructElement">
                     <option value="horizontal">Linha Horizontal</option>
                     <option value="vertical">Linha Vertical</option>
@@ -535,7 +525,7 @@
             </fieldset>
 
             <fieldset class="control-fieldset">
-              <legend>Operações Morfológicas Compostas</legend>
+              <legend>Operações Morfológicas Avançadas</legend>
               <div class="fieldset-content">
                 <div class="control-group-inline">
                   <button class="btn-operation" onclick="opening()">
@@ -544,14 +534,6 @@
                   <button class="btn-operation" onclick="closing()">
                     Fechamento
                   </button>
-                </div>
-              </div>
-            </fieldset>
-
-            <fieldset class="control-fieldset">
-              <legend>Operações Morfológicas Avançadas</legend>
-              <div class="fieldset-content">
-                <div class="control-group-inline">
                   <button class="btn-operation" onclick="outline()">
                     Contorno
                   </button>

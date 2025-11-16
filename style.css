@@ -357,6 +357,11 @@ body {
   margin: 20px 0;
 }
 
+/* Ajustes para os fieldsets da seção 6 */
+.controls {
+  justify-content: center;
+}
+
 /* ===== LABELS E INPUTS ===== */
 label {
   font-weight: 600;
@@ -366,7 +371,10 @@ label {
 }
 
 input[type="number"],
-.valueSelector {
+.valueSelector,
+#passaBaixaKernel,
+#morphKernelSize,
+#morphStructElement {
   padding: 10px;
   border: 1px solid var(--border-input);
   border-radius: 15px;
@@ -378,10 +386,21 @@ input[type="number"],
 }
 
 input[type="number"]:focus,
-.valueSelector:focus {
+.valueSelector:focus,
+#passaBaixaKernel:focus,
+#morphKernelSize:focus,
+#morphStructElement:focus {
   outline: none;
   border-color: var(--border-input-focus);
   box-shadow: 0 0 0 3px var(--bg-upload);
+}
+
+input[type="range"] {
+  accent-color: var(--btn-operation);
+}
+
+select option:hover {
+  background-color: var(--bg-fieldset);
 }
 
 /* ===== BOTÕES ===== */

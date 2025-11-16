@@ -88,11 +88,29 @@ const glaussValue = document.getElementById("glaussValue");
 // Quando o range mudar, atualizar o number
 glaussRange.addEventListener("input", function () {
   glaussValue.value = this.value;
+  glaussView();
 });
 
 // Quando o number mudar, atualizar o range
 glaussValue.addEventListener("input", function () {
   glaussRange.value = this.value;
+  glaussView();
+});
+
+// Atualizar visualização quando o tamanho do kernel mudar
+passaBaixaKernel.addEventListener("change", function () {
+  const size = parseInt(this.value);
+  const max = size * size;
+  ordemRange.max = max;
+  ordemValue.max = max;
+  ordemRange.value = parseInt(max / 2);
+  ordemValue.value = parseInt(max / 2);
+  glaussView();
+});
+
+// Inicializar visualização do kernel gaussiano
+document.addEventListener("DOMContentLoaded", function () {
+  glaussView();
 });
 
 function setAtive(ev) {
@@ -1545,6 +1563,67 @@ function generateGaussianKernel(size) {
   }
 
   return kernel;
+}
+
+function glaussView() {
+  const canvas = document.getElementById("gaussianKernelCanvas");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const kernelSize = parseInt(
+    document.getElementById("passaBaixaKernel").value
+  );
+  const kernel = generateGaussianKernel(kernelSize);
+
+  // Limpar canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Encontrar valor máximo para normalização
+  let maxValue = 0;
+  for (let y = 0; y < kernelSize; y++) {
+    for (let x = 0; x < kernelSize; x++) {
+      maxValue = Math.max(maxValue, kernel[y][x]);
+    }
+  }
+
+  // Calcular tamanho de cada célula
+  const cellSize = Math.min(canvas.width, canvas.height) / kernelSize;
+  const padding = 2;
+
+  // Desenhar kernel
+  for (let y = 0; y < kernelSize; y++) {
+    for (let x = 0; x < kernelSize; x++) {
+      const value = kernel[y][x];
+      const normalizedValue = value / maxValue;
+
+      // Cor: quanto maior o valor, mais claro (branco = mais peso)
+      const intensity = Math.floor(255 * normalizedValue);
+      ctx.fillStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
+
+      // Desenhar célula
+      ctx.fillRect(
+        x * cellSize + padding,
+        y * cellSize + padding,
+        cellSize - padding * 2,
+        cellSize - padding * 2
+      );
+    }
+  }
+
+  // Desenhar grade
+  ctx.strokeStyle = "#666";
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= kernelSize; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * cellSize, 0);
+    ctx.lineTo(i * cellSize, kernelSize * cellSize);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, i * cellSize);
+    ctx.lineTo(kernelSize * cellSize, i * cellSize);
+    ctx.stroke();
+  }
 }
 
 function prewitt() {
