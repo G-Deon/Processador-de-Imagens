@@ -1151,12 +1151,14 @@ function drawHistogram(histogram, canvasId, title) {
 }
 
 function showHistogramBefore() {
-  if (!image1Data) {
-    showStatus("Por favor, carregue a primeira imagem!", "error");
+  if (!image1Data && !image2Data) {
+    showStatus("Por favor, carregue uma imagem!", "error");
     return;
   }
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
 
-  const histogram = calculateHistogram(image1Data);
+  const histogram = calculateHistogram(imgData);
 
   const histogramCanvas = drawHistogram(
     histogram,
@@ -1172,14 +1174,16 @@ function showHistogramBefore() {
 }
 
 function equalizeHistogram() {
-  if (!image1Data) {
-    showStatus("Por favor, carregue a primeira imagem!", "error");
+  if (!image1Data && !image2Data) {
+    showStatus("Por favor, carregue uma imagem!", "error");
     return;
   }
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
 
   showHistogramBefore();
 
-  const originalHistogram = calculateHistogram(image1Data);
+  const originalHistogram = calculateHistogram(imgData);
 
   const cdf = new Array(256).fill(0);
   cdf[0] = originalHistogram.gray[0];
@@ -1188,27 +1192,24 @@ function equalizeHistogram() {
     cdf[i] = cdf[i - 1] + originalHistogram.gray[i];
   }
 
-  const totalPixels = image1Data.width * image1Data.height;
+  const totalPixels = imgData.width * imgData.height;
   const normalizedCdf = cdf.map((value) =>
     Math.round((value / totalPixels) * 255)
   );
 
   const canvas = document.createElement("canvas");
-  canvas.width = image1Data.width;
-  canvas.height = image1Data.height;
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
   const ctx = canvas.getContext("2d");
 
-  const equalizedImageData = ctx.createImageData(
-    image1Data.width,
-    image1Data.height
-  );
+  const equalizedImageData = ctx.createImageData(imgData.width, imgData.height);
   const equalizedData = equalizedImageData.data;
 
-  for (let i = 0; i < image1Data.data.length; i += 4) {
-    const r = image1Data.data[i];
-    const g = image1Data.data[i + 1];
-    const b = image1Data.data[i + 2];
-    const a = image1Data.data[i + 3];
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const r = imgData.data[i];
+    const g = imgData.data[i + 1];
+    const b = imgData.data[i + 2];
+    const a = imgData.data[i + 3];
 
     const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
     const newGray = normalizedCdf[gray];
