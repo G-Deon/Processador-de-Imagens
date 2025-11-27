@@ -1694,6 +1694,7 @@ function prewitt() {
   }
   const img1 = document.getElementById("image1-display");
   const imgData = img1 ? image1Data : image2Data;
+  const direction = document.getElementById("edgeDirection").value;
 
   const width = imgData.width;
   const height = imgData.height;
@@ -1750,9 +1751,21 @@ function prewitt() {
         }
       }
 
-      const magnitudeR = Math.sqrt(gxR * gxR + gyR * gyR);
-      const magnitudeG = Math.sqrt(gxG * gxG + gyG * gyG);
-      const magnitudeB = Math.sqrt(gxB * gxB + gyB * gyB);
+      let magnitudeR, magnitudeG, magnitudeB;
+
+      if (direction === "horizontal") {
+        magnitudeR = Math.abs(gxR);
+        magnitudeG = Math.abs(gxG);
+        magnitudeB = Math.abs(gxB);
+      } else if (direction === "vertical") {
+        magnitudeR = Math.abs(gyR);
+        magnitudeG = Math.abs(gyG);
+        magnitudeB = Math.abs(gyB);
+      } else {
+        magnitudeR = Math.sqrt(gxR * gxR + gyR * gyR);
+        magnitudeG = Math.sqrt(gxG * gxG + gyG * gyG);
+        magnitudeB = Math.sqrt(gxB * gxB + gyB * gyB);
+      }
 
       const i = (y * width + x) * 4;
       resultData[i] = Math.min(255, Math.max(0, magnitudeR));
@@ -1763,7 +1776,10 @@ function prewitt() {
   }
 
   ctx.putImageData(resultImageData, 0, 0);
-  displayImage(canvas, "Prewitt", "result-display");
+  let title = "Prewitt";
+  if (direction === "horizontal") title += " Horizontal";
+  else if (direction === "vertical") title += " Vertical";
+  displayImage(canvas, title, "result-display");
   showStatus("Filtro Prewitt aplicado com sucesso!", "sucess");
 }
 
@@ -1774,6 +1790,7 @@ function sobel() {
   }
   const img1 = document.getElementById("image1-display");
   const imgData = img1 ? image1Data : image2Data;
+  const direction = document.getElementById("edgeDirection").value;
 
   const width = imgData.width;
   const height = imgData.height;
@@ -1830,9 +1847,21 @@ function sobel() {
         }
       }
 
-      const magnitudeR = Math.sqrt(gxR * gxR + gyR * gyR);
-      const magnitudeG = Math.sqrt(gxG * gxG + gyG * gyG);
-      const magnitudeB = Math.sqrt(gxB * gxB + gyB * gyB);
+      let magnitudeR, magnitudeG, magnitudeB;
+
+      if (direction === "horizontal") {
+        magnitudeR = Math.abs(gxR);
+        magnitudeG = Math.abs(gxG);
+        magnitudeB = Math.abs(gxB);
+      } else if (direction === "vertical") {
+        magnitudeR = Math.abs(gyR);
+        magnitudeG = Math.abs(gyG);
+        magnitudeB = Math.abs(gyB);
+      } else {
+        magnitudeR = Math.sqrt(gxR * gxR + gyR * gyR);
+        magnitudeG = Math.sqrt(gxG * gxG + gyG * gyG);
+        magnitudeB = Math.sqrt(gxB * gxB + gyB * gyB);
+      }
 
       const i = (y * width + x) * 4;
       resultData[i] = Math.min(255, Math.max(0, magnitudeR));
@@ -1843,7 +1872,10 @@ function sobel() {
   }
 
   ctx.putImageData(resultImageData, 0, 0);
-  displayImage(canvas, "Sobel", "result-display");
+  let title = "Sobel";
+  if (direction === "horizontal") title += " Horizontal";
+  else if (direction === "vertical") title += " Vertical";
+  displayImage(canvas, title, "result-display");
   showStatus("Filtro Sobel aplicado com sucesso!", "sucess");
 }
 

@@ -374,7 +374,8 @@ input[type="number"],
 .valueSelector,
 #passaBaixaKernel,
 #morphKernelSize,
-#morphStructElement {
+#morphStructElement,
+#edgeDirection {
   padding: 10px;
   border: 1px solid var(--border-input);
   border-radius: 15px;
@@ -389,7 +390,8 @@ input[type="number"]:focus,
 .valueSelector:focus,
 #passaBaixaKernel:focus,
 #morphKernelSize:focus,
-#morphStructElement:focus {
+#morphStructElement:focus,
+#edgeDirection:focus {
   outline: none;
   border-color: var(--border-input-focus);
   box-shadow: 0 0 0 3px var(--bg-upload);
