@@ -452,24 +452,6 @@ function showStatus(mensagem, tipo) {
   }, 5000);
 }
 
-function addImages() {
-  if (!image1Data || !image2Data) {
-    showStatus("Por favor, carregue duas imagens!", "error");
-    return;
-  }
-
-  processImages("add");
-}
-
-function subtractImages() {
-  if (!image1Data || !image2Data) {
-    showStatus("Por favor, carregue duas imagens!", "error");
-    return;
-  }
-
-  processImages("subtract");
-}
-
 function addValueToImage() {
   if (!image1Data && !image2Data) {
     showStatus("Por favor, carregue uma imagem!", "error");
@@ -477,7 +459,31 @@ function addValueToImage() {
   }
 
   const value = parseInt(document.getElementById("valueInput").value);
-  processImageWithValue("add", value);
+  const canvas = document.createElement("canvas");
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(imgData.width, imgData.height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const r = imgData.data[i];
+    const g = imgData.data[i + 1];
+    const b = imgData.data[i + 2];
+    const a = imgData.data[i + 3];
+
+    resultData[i] = Math.min(255, r + value);
+    resultData[i + 1] = Math.min(255, g + value);
+    resultData[i + 2] = Math.min(255, b + value);
+    resultData[i + 3] = a;
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Imagem + " + value, "result-display");
+  showStatus("Imagem + " + value + " concluída com sucesso!", "sucess");
 }
 
 function subtractValueFromImage() {
@@ -487,7 +493,31 @@ function subtractValueFromImage() {
   }
 
   const value = parseInt(document.getElementById("valueInput").value);
-  processImageWithValue("subtract", value);
+  const canvas = document.createElement("canvas");
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(imgData.width, imgData.height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const r = imgData.data[i];
+    const g = imgData.data[i + 1];
+    const b = imgData.data[i + 2];
+    const a = imgData.data[i + 3];
+
+    resultData[i] = Math.max(0, r - value);
+    resultData[i + 1] = Math.max(0, g - value);
+    resultData[i + 2] = Math.max(0, b - value);
+    resultData[i + 3] = a;
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Imagem - " + value, "result-display");
+  showStatus("Imagem - " + value + " concluída com sucesso!", "sucess");
 }
 
 function multiValueToImage() {
@@ -499,7 +529,31 @@ function multiValueToImage() {
   const value = parseFloat(
     document.querySelector('input[id="valueSelectorValue"]').value
   );
-  processImageWithValue("multi", value);
+  const canvas = document.createElement("canvas");
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(imgData.width, imgData.height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const r = imgData.data[i];
+    const g = imgData.data[i + 1];
+    const b = imgData.data[i + 2];
+    const a = imgData.data[i + 3];
+
+    resultData[i] = Math.max(0, r * value);
+    resultData[i + 1] = Math.max(0, g * value);
+    resultData[i + 2] = Math.max(0, b * value);
+    resultData[i + 3] = a;
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Imagem * " + value, "result-display");
+  showStatus("Imagem * " + value + " concluída com sucesso!", "sucess");
 }
 
 function dividerValueToImage() {
@@ -511,7 +565,31 @@ function dividerValueToImage() {
   const value = parseFloat(
     document.querySelector('input[id="valueSelectorValue"]').value
   );
-  processImageWithValue("divider", value);
+  const canvas = document.createElement("canvas");
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(imgData.width, imgData.height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const r = imgData.data[i];
+    const g = imgData.data[i + 1];
+    const b = imgData.data[i + 2];
+    const a = imgData.data[i + 3];
+
+    resultData[i] = Math.max(0, r / value);
+    resultData[i + 1] = Math.max(0, g / value);
+    resultData[i + 2] = Math.max(0, b / value);
+    resultData[i + 3] = a;
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Imagem / " + value, "result-display");
+  showStatus("Imagem / " + value + " concluída com sucesso!", "sucess");
 }
 
 function grayTransform() {
@@ -520,8 +598,52 @@ function grayTransform() {
     return;
   }
 
-  const value = 3;
-  processImageWithValue("gray", value);
+  const canvas = document.createElement("canvas");
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(imgData.width, imgData.height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const r = imgData.data[i];
+    const g = imgData.data[i + 1];
+    const b = imgData.data[i + 2];
+    const a = imgData.data[i + 3];
+    const gray = (r + g + b) / 3;
+
+    resultData[i] = gray;
+    resultData[i + 1] = gray;
+    resultData[i + 2] = gray;
+    resultData[i + 3] = a;
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Imagem em Escala de Cinza", "result-display");
+  showStatus("Imagem em Escala de Cinza concluída com sucesso!", "sucess");
+}
+
+function convertToBinary(imgData, threshold) {
+  const canvas = document.createElement("canvas");
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
+  const ctx = canvas.getContext("2d");
+  const binData = ctx.createImageData(imgData.width, imgData.height);
+
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const gray =
+      (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
+    const binary = gray > threshold ? 255 : 0;
+    binData.data[i] = binary;
+    binData.data[i + 1] = binary;
+    binData.data[i + 2] = binary;
+    binData.data[i + 3] = imgData.data[i + 3];
+  }
+
+  return binData;
 }
 
 function binaryConvert() {
@@ -531,7 +653,19 @@ function binaryConvert() {
   }
 
   const value = parseInt(document.getElementById("binaryValue").value);
-  processImageWithValue("binary", value);
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
+
+  const binData = convertToBinary(imgData, value);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = binData.width;
+  canvas.height = binData.height;
+  const ctx = canvas.getContext("2d");
+  ctx.putImageData(binData, 0, 0);
+
+  displayImage(canvas, "Imagem Binária", "result-display");
+  showStatus("Imagem Binária concluída com sucesso!", "sucess");
 }
 
 function negativeTransform() {
@@ -539,8 +673,32 @@ function negativeTransform() {
     showStatus("Por favor, carregue uma imagem!", "error");
     return;
   }
-  const value = 255;
-  processImageWithValue("negative", value);
+
+  const canvas = document.createElement("canvas");
+  const img1 = document.getElementById("image1-display");
+  const imgData = img1 ? image1Data : image2Data;
+  canvas.width = imgData.width;
+  canvas.height = imgData.height;
+  const ctx = canvas.getContext("2d");
+
+  const resultImageData = ctx.createImageData(imgData.width, imgData.height);
+  const resultData = resultImageData.data;
+
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const r = imgData.data[i];
+    const g = imgData.data[i + 1];
+    const b = imgData.data[i + 2];
+    const a = imgData.data[i + 3];
+
+    resultData[i] = 255 - r;
+    resultData[i + 1] = 255 - g;
+    resultData[i + 2] = 255 - b;
+    resultData[i + 3] = a;
+  }
+
+  ctx.putImageData(resultImageData, 0, 0);
+  displayImage(canvas, "Imagem Negativa", "result-display");
+  showStatus("Imagem Negativa concluída com sucesso!", "sucess");
 }
 
 function andLogic() {
@@ -576,6 +734,10 @@ function xorLogic() {
 }
 
 function processImages(operation) {
+  if (!image1Data || !image2Data) {
+    showStatus("Por favor, carregue duas imagens!", "error");
+    return;
+  }
   const width = Math.min(image1Data.width, image2Data.width);
   const height = Math.min(image1Data.height, image2Data.height);
 
@@ -598,14 +760,17 @@ function processImages(operation) {
     const b2 = image2Data.data[i + 2];
     const a2 = image2Data.data[i + 3];
 
-    if (operation === "add") {
-      resultData[i] = Math.min(255, r1 + r2);
-      resultData[i + 1] = Math.min(255, g1 + g2);
-      resultData[i + 2] = Math.min(255, b1 + b2);
-    } else {
-      resultData[i] = Math.max(0, r1 - r2);
-      resultData[i + 1] = Math.max(0, g1 - g2);
-      resultData[i + 2] = Math.max(0, b1 - b2);
+    switch (operation) {
+      case "add":
+        resultData[i] = Math.min(255, r1 + r2);
+        resultData[i + 1] = Math.min(255, g1 + g2);
+        resultData[i + 2] = Math.min(255, b1 + b2);
+        break;
+      case "sub":
+        resultData[i] = Math.max(0, r1 - r2);
+        resultData[i + 1] = Math.max(0, g1 - g2);
+        resultData[i + 2] = Math.max(0, b1 - b2);
+        break;
     }
     resultData[i + 3] = Math.min(a1, a2);
   }
@@ -618,98 +783,6 @@ function processImages(operation) {
     title = "Subtração das Imagens";
   }
   displayImage(canvas, title, "result-display");
-  showStatus(title + " concluída com sucesso!", "sucess");
-}
-
-function processImageWithValue(operation, value) {
-  const canvas = document.createElement("canvas");
-  const img1 = document.getElementById("image1-display");
-  const imgData = img1 ? image1Data : image2Data;
-  canvas.width = imgData.width;
-  canvas.height = imgData.height;
-  const ctx = canvas.getContext("2d");
-
-  const resultImageData = ctx.createImageData(imgData.width, imgData.height);
-  const resultData = resultImageData.data;
-
-  for (let i = 0; i < imgData.data.length; i += 4) {
-    const r = imgData.data[i];
-    const g = imgData.data[i + 1];
-    const b = imgData.data[i + 2];
-    const a = imgData.data[i + 3];
-
-    switch (operation) {
-      case "add":
-        resultData[i] = Math.min(255, r + value);
-        resultData[i + 1] = Math.min(255, g + value);
-        resultData[i + 2] = Math.min(255, b + value);
-        resultData[i + 3] = a;
-        break;
-      case "subtract":
-        resultData[i] = Math.max(0, r - value);
-        resultData[i + 1] = Math.max(0, g - value);
-        resultData[i + 2] = Math.max(0, b - value);
-        resultData[i + 3] = a;
-        break;
-      case "multi":
-        resultData[i] = Math.max(0, r * value);
-        resultData[i + 1] = Math.max(0, g * value);
-        resultData[i + 2] = Math.max(0, b * value);
-        resultData[i + 3] = a;
-        break;
-      case "divider":
-        resultData[i] = Math.max(0, r / value);
-        resultData[i + 1] = Math.max(0, g / value);
-        resultData[i + 2] = Math.max(0, b / value);
-        resultData[i + 3] = a;
-        break;
-      case "gray":
-        resultData[i] = Math.max(0, (r + g + b) / value);
-        resultData[i + 1] = Math.max(0, (r + g + b) / value);
-        resultData[i + 2] = Math.max(0, (r + g + b) / value);
-        resultData[i + 3] = a;
-        break;
-      case "negative":
-        resultData[i] = Math.max(0, value - r);
-        resultData[i + 1] = Math.max(0, value - g);
-        resultData[i + 2] = Math.max(0, value - b);
-        resultData[i + 3] = a;
-        break;
-      case "binary":
-        resultData[i] = Math.max(0, (r + g + b) / 3) > value ? 255 : 0;
-        resultData[i + 1] = Math.max(0, (r + g + b) / 3) > value ? 255 : 0;
-        resultData[i + 2] = Math.max(0, (r + g + b) / 3) > value ? 255 : 0;
-        resultData[i + 3] = a;
-    }
-  }
-
-  ctx.putImageData(resultImageData, 0, 0);
-  let title;
-  switch (operation) {
-    case "add":
-      title = "Imagem + " + value;
-      break;
-    case "subtract":
-      title = "Imagem - " + value;
-      break;
-    case "multi":
-      title = "Imagem * " + value;
-      break;
-    case "divider":
-      title = "Imagem / " + value;
-      break;
-    case "gray":
-      title = "Imagem em Escala de Cinza";
-      break;
-    case "negative":
-      title = "Imagem Negativa";
-      break;
-    case "binary":
-      title = "Imagem Binária";
-      break;
-  }
-  displayImage(canvas, title, "result-display");
-
   showStatus(title + " concluída com sucesso!", "sucess");
 }
 
@@ -890,11 +963,15 @@ function media() {
 }
 
 function logicProcess(operation) {
+  const value = parseInt(document.getElementById("binaryValue").value);
+
   if (operation === "not") {
     const img1 = document.getElementById("image1-display");
     const imgData = img1 ? image1Data : image2Data;
-    const width = imgData.width;
-    const height = imgData.height;
+
+    const binData = convertToBinary(imgData, value);
+    const width = binData.width;
+    const height = binData.height;
 
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -905,8 +982,8 @@ function logicProcess(operation) {
     const resultData = resultImageData.data;
 
     for (let i = 0; i < width * height * 4; i += 4) {
-      const r1 = imgData.data[i];
-      const a1 = imgData.data[i + 3];
+      const r1 = binData.data[i];
+      const a1 = binData.data[i + 3];
 
       if (r1 === 0) {
         resultData[i] = 255;
@@ -923,8 +1000,11 @@ function logicProcess(operation) {
     displayImage(canvas, "Imagem NOT", "result-display");
     showStatus("NOT da imagem concluída com sucesso!", "sucess");
   } else {
-    const width = Math.min(image1Data.width, image2Data.width);
-    const height = Math.min(image1Data.height, image2Data.height);
+    const bin1Data = convertToBinary(image1Data, value);
+    const bin2Data = convertToBinary(image2Data, value);
+
+    const width = Math.min(bin1Data.width, bin2Data.width);
+    const height = Math.min(bin1Data.height, bin2Data.height);
 
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -935,20 +1015,20 @@ function logicProcess(operation) {
     const resultData = resultImageData.data;
 
     for (let i = 0; i < width * height * 4; i += 4) {
-      const r1 = image1Data.data[i];
-      const g1 = image1Data.data[i + 1];
-      const b1 = image1Data.data[i + 2];
-      const a1 = image1Data.data[i + 3];
+      const r1 = bin1Data.data[i];
+      const g1 = bin1Data.data[i + 1];
+      const b1 = bin1Data.data[i + 2];
+      const a1 = bin1Data.data[i + 3];
 
-      const r2 = image2Data.data[i];
-      const a2 = image2Data.data[i + 3];
+      const r2 = bin2Data.data[i];
+      const a2 = bin2Data.data[i + 3];
 
       switch (operation) {
         case "and":
-          if (r1 === r2) {
-            resultData[i] = r1;
-            resultData[i + 1] = g1;
-            resultData[i + 2] = b1;
+          if (r1 === 255 && r2 === 255) {
+            resultData[i] = 255;
+            resultData[i + 1] = 255;
+            resultData[i + 2] = 255;
           } else {
             resultData[i] = 0;
             resultData[i + 1] = 0;
@@ -957,26 +1037,26 @@ function logicProcess(operation) {
           break;
 
         case "or":
-          if (r1 === r2) {
-            resultData[i] = r1;
-            resultData[i + 1] = g1;
-            resultData[i + 2] = b1;
-          } else {
+          if (r1 === 255 || r2 === 255) {
             resultData[i] = 255;
             resultData[i + 1] = 255;
             resultData[i + 2] = 255;
+          } else {
+            resultData[i] = 0;
+            resultData[i + 1] = 0;
+            resultData[i + 2] = 0;
           }
           break;
 
         case "xor":
-          if (r1 === r2) {
-            resultData[i] = 0;
-            resultData[i + 1] = 0;
-            resultData[i + 2] = 0;
-          } else {
+          if (r1 !== r2) {
             resultData[i] = 255;
             resultData[i + 1] = 255;
             resultData[i + 2] = 255;
+          } else {
+            resultData[i] = 0;
+            resultData[i + 1] = 0;
+            resultData[i + 2] = 0;
           }
           break;
       }
